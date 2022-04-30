@@ -2,3 +2,4 @@
 name        = "Test Plugin"
 author      = "Max"
 category    = "Testing"
+version     = "0.1.0"
