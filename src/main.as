@@ -4,28 +4,32 @@ bool Setting_Enabled = true;
 [Setting name="Key to block for 'Give up'"]
 VirtualKey Setting_KeyGiveUp = VirtualKey::Delete;
 
-[Setting name="Block 'Give up' in COTD"]
+[Setting name="Block 'Give up' in COTD (TM_KnockoutDaily_Online)"]
 bool Setting_BlockDelCotd = true;
 
-[Setting name="Block 'Give up' in Ranked"]
+[Setting name="Block 'Give up' in Ranked (TM_Teams_Matchmaking_Online)"]
 bool Setting_BlockDelRanked = true;
 
-[Setting name="Block 'Give up' in Knockout"]
+[Setting name="Block 'Give up' in Knockout (TM_Knockout_Online)"]
 bool Setting_BlockDelKO = true;
 
-[Setting name="Block 'Give up' in Custom Mode 1 (e.g., 'TM_Cup_Online') -- blank for none."]
-string Settings_BlockDelCustom1 = "";
+// // todo: implementation for the below
+// [Setting category="Custom Modes" name="Block 'Give up' in Custom Mode 1 -- blank for none."]
+// string Settings_BlockDelCustom1 = "";
 
-[Setting name="Block 'Give up' in Custom Mode 2 (e.g., 'TM_Cup_Online') -- blank for none."]
-string Settings_BlockDelCustom2 = "";
+// [Setting category="Custom Modes" name="Block 'Give up' in Custom Mode 2 -- blank for none."]
+// string Settings_BlockDelCustom2 = "";
 
-[Setting name="Block 'Give up' in Custom Mode 3 (e.g., 'TM_Cup_Online') -- blank for none."]
-string Settings_BlockDelCustom3 = "";
+// [Setting category="Custom Modes" name="Block 'Give up' in Custom Mode 3 -- blank for none."]
+// string Settings_BlockDelCustom3 = "";
 
 
+
+// used to rate-limit game type log msgs
 uint64 lastPrint = 0;
 
 
+// todo: it looks like `#IF DEVELOP` is possible; not sure how yet
 const bool DEV_MODE = true;
 
 
@@ -76,7 +80,9 @@ UI::InputBlocking OnKeyPress(bool down, VirtualKey key) {
       return UI::InputBlocking::DoNothing;
    }
 
-   if (down) {
+   print("Key (" + key + ") " + (down ? "pressed" : "released"));
+
+   if (true || down) {
       // todo: handle an override key
       //   0. set override key to 'up' on map load
       //   1. track override key up/down status
@@ -84,7 +90,9 @@ UI::InputBlocking OnKeyPress(bool down, VirtualKey key) {
 
       bool appropriateMatch = IsRankedOrCOTD();
 
-      if (key == Setting_KeyGiveUp && appropriateMatch) {
+      // note: whether we check for down or not doesn't seem to matter
+
+      if (down && key == Setting_KeyGiveUp && appropriateMatch) {
          print("Blocked give up!");
          return UI::InputBlocking::Block;
       }
@@ -102,13 +110,17 @@ bool IsRankedOrCOTD() {
 
    // we want to allow resets when in the warm-up phase.
    // note: This seems to always be false in TM_KnockoutDaily_Online
-   bool isWarmUp = server_info.IsWarmUp;
+   // bool isWarmUp = server_info.IsWarmUp;
+   const bool isWarmUp = false;
 
    bool ret = (app.CurrentPlayground !is null && !isWarmUp &&
       ( false  // this `false` is just to make the below ORs line up nicely (for easy commenting)
       || (Setting_BlockDelCotd   && server_info.CurGameModeStr == "TM_KnockoutDaily_Online")
       || (Setting_BlockDelKO     && server_info.CurGameModeStr == "TM_Knockout_Online")
       || (Setting_BlockDelRanked && server_info.CurGameModeStr == "TM_Teams_Matchmaking_Online")
+      || (server_info.CurGameModeStr == Settings_BlockDelCustom1)
+      || (server_info.CurGameModeStr == Settings_BlockDelCustom2)
+      || (server_info.CurGameModeStr == Settings_BlockDelCustom3)
       )
    );
 
@@ -119,7 +131,6 @@ bool IsRankedOrCOTD() {
       if (now - lastPrint > 5000) {
          lastPrint = now;
          print("CurGameModeStr = " + server_info.CurGameModeStr);
-         print("isWarmUp = " + isWarmUp);
       }
    }
 
@@ -135,8 +146,11 @@ bool IsRankedOrCOTD() {
 // * don't do these ones
 
 // TM_Royal_Online -- royal during Super Royal qualis; Super Royal Finals; (?? normally, too ??)
+// TM_Campaign_Local -- local campaign, local TOTD
 
-// ? not sure about whether to enable/disable for these
+// ? not sure about whether to enable/disable for these -- can be added as custom tho
 // TM_Cup_Online -- "cup" game format on server
-// Champion (mb TM_Champion_Online) -- a guess
-// TM_Teams_Online -- a guess (like ranked but ad-hoc?)
+// Champion (mb TM_Champion_Online) -- a guess -- not sure if this even exists
+// TM_Teams_Online -- teams, first points to 100 by default
+// TM_Rounds_Online
+// TM_TimeAttack_Online
