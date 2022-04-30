@@ -40,7 +40,7 @@ _colortext16 green "✅ Output file/folder name: ${PLUGIN_NAME}"
 
 BUILD_NAME=$PLUGIN_NAME-$(date +%s).zip
 RELEASE_NAME=$PLUGIN_NAME-latest.op
-PLUGINS_DIR=$HOME/win/OpenplanetNext/Plugins
+PLUGINS_DIR=${PLUGINS_DIR:-$HOME/win/OpenplanetNext/Plugins}
 PLUGIN_DEV_LOC=$PLUGINS_DIR/$PLUGIN_NAME
 PLUGIN_RELEASE_LOC=$PLUGINS_DIR/$RELEASE_NAME
 
