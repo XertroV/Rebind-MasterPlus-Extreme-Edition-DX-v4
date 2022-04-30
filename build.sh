@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 # https://greengumdrops.net/index.php/colorize-your-bash-scripts-bash-color-library/
-source ./_colors.bash
+source ./vendor/_colors.bash
 
 _build_mode=${1:-dev}
 
