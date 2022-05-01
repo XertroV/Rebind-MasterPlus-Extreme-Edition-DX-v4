@@ -44,7 +44,7 @@ void Main() {
    auto app = GetTmApp();
 
    // ! huh, apparently we don't need to instantiate it?
-   unbindPrompt = UnbindPrompt();
+   // unbindPrompt = UnbindPrompt();
 
    // while (true) {
    //    // auto pad = app.InputPort.Script_Pads[1];
@@ -98,11 +98,17 @@ void RenderMenu() {
    // if (UI::MenuItem("DialogChooseLeague")) {
    //    mm.DialogChooseLeague();
    // }
+
+   if (unbindPrompt !is null) {
+      unbindPrompt.RenderMenu();
+   }
 }
 
 
 void _Render() {
-   unbindPrompt.Draw();
+   if (unbindPrompt !is null) {
+      unbindPrompt.Draw();
+   }
 }
 
 void RenderInterface() {

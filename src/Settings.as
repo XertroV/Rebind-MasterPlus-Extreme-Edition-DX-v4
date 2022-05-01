@@ -44,8 +44,8 @@ bool Setting_HideAfterDebind = true;
 [Setting category="UI Window" name="Position"]
 vec2 Setting_Pos = vec2(400, 400);
 
-[Setting category="UI Window" name="Dimensions"]
-vec2 Setting_Dims = vec2(200 * 16 / 10, 200);
+// [Setting category="UI Window" name="Dimensions"]
+// vec2 Setting_Dims = vec2(200 * 16 / 10, 200);
 
 [Setting category="UI Window" name="Lock Window?"]
 bool Setting_PromptLocked = false;
