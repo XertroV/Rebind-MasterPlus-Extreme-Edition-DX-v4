@@ -1,37 +1,13 @@
-[Setting name="Enabled?"]
-bool Setting_Enabled = true;
-
-[Setting name="Key to block for 'Give up'"]
-VirtualKey Setting_KeyGiveUp = VirtualKey::Delete;
-
-[Setting name="Block 'Give up' in COTD (TM_KnockoutDaily_Online)"]
-bool Setting_BlockDelCotd = true;
-
-[Setting name="Block 'Give up' in Ranked (TM_Teams_Matchmaking_Online)"]
-bool Setting_BlockDelRanked = true;
-
-[Setting name="Block 'Give up' in Knockout (TM_Knockout_Online)"]
-bool Setting_BlockDelKO = true;
-
-// // todo: implementation for the below
-// [Setting category="Custom Modes" name="Block 'Give up' in Custom Mode 1 -- blank for none."]
-// string Settings_BlockDelCustom1 = "";
-
-// [Setting category="Custom Modes" name="Block 'Give up' in Custom Mode 2 -- blank for none."]
-// string Settings_BlockDelCustom2 = "";
-
-// [Setting category="Custom Modes" name="Block 'Give up' in Custom Mode 3 -- blank for none."]
-// string Settings_BlockDelCustom3 = "";
-
-
+// todo: it looks like `#IF DEVELOP` is possible; not sure how yet
+const bool DEV_MODE = true;
 
 // used to rate-limit game type log msgs
 uint64 lastPrint = 0;
 
+// This seems to be constant, but might not be
+const uint GIVE_UP_ACTION_INDEX = 7;
 
-// todo: it looks like `#IF DEVELOP` is possible; not sure how yet
-const bool DEV_MODE = true;
-
+const string PLUGIN_TITLE = "Never Give Up!";
 
 // debug function for printing members of a MwClassInfo recursively
 void _printMembers(const Reflection::MwClassInfo@ ty) {
@@ -56,8 +32,34 @@ void printMembers(CMwNod@ nod) {
 }
 
 
+CTrackMania@ GetTmApp() {
+   return cast<CTrackMania>(GetApp());
+}
+
+
+UnbindPrompt unbindPrompt;
+
+
 void Main() {
-   // nothing to do on init
+   auto app = GetTmApp();
+
+   // ! huh, apparently we don't need to instantiate it?
+   unbindPrompt = UnbindPrompt();
+
+   // while (true) {
+   //    // auto pad = app.InputPort.Script_Pads[1];
+   //    // auto _in = app.MenuManager.MenuCustom_CurrentManiaApp.Input;
+   //    // auto dn = _in.GetActionDisplayName("Vehicle", "GiveUp");  // => "Give Up"
+   //    // auto binding = _in.GetActionBinding(pad, "Vehicle", "GiveUp");  // => "Delete"
+   //    // // print(tostring(binding));
+   //    // // app.MenuManager.DialogInputSettings();
+   //    // // app.MenuManager.MenuConfigureInputs();
+   //    // // printMembers(app.MenuManager);
+   //    // // app.MenuManager.MenuStatistics();
+   //    // // app.MenuManager.MenuCampaignChallenges();
+   //    // sleep(5000);
+   //    yield();
+   // }
 }
 
 
@@ -65,12 +67,50 @@ void OnSettingsChanged() {
    // nothing to update
 }
 
-
 void RenderMenu() {
    // bool clickedMenu = UI::MenuItem("TestMenu");
    // if (clickedMenu) {
    //    print("clickedMenu = true");
    // }
+   auto app = GetTmApp();
+   auto mm = cast<CTrackManiaMenus>(app.MenuManager);
+   // if (UI::MenuItem("MenuTest: Main")) {
+   //    mm.MenuMain();
+   // }
+   // if (UI::MenuItem("MenuTest: Profile")) {
+   //    mm.MenuProfile();
+   // }
+   // if (UI::MenuItem("MenuMultiPlayerNetworkCreate")) {
+   //    mm.MenuMultiPlayerNetworkCreate();
+   // }
+   // if (UI::MenuItem("MenuHotSeatCreate")) {
+   //    mm.MenuHotSeatCreate();
+   // }
+   // if (UI::MenuItem("MenuConfigureInputs")) {
+   //    mm.MenuConfigureInputs();
+   // }
+   // if (UI::MenuItem("MenuProfileAdvanced")) {
+   //    mm.MenuProfileAdvanced();
+   // }
+   // if (UI::MenuItem("MenuProfile_Launch")) {
+   //    mm.MenuProfile_Launch();
+   // }
+   // if (UI::MenuItem("DialogChooseLeague")) {
+   //    mm.DialogChooseLeague();
+   // }
+}
+
+
+void _Render() {
+   unbindPrompt.Draw();
+}
+
+void RenderInterface() {
+   _Render();
+}
+
+void Render() {
+   // RenderInterface();
 }
 
 
@@ -80,7 +120,7 @@ UI::InputBlocking OnKeyPress(bool down, VirtualKey key) {
       return UI::InputBlocking::DoNothing;
    }
 
-   print("Key (" + key + ") " + (down ? "pressed" : "released"));
+   // print("Key (" + key + ") " + (down ? "pressed" : "released"));
 
    if (true || down) {
       // todo: handle an override key
@@ -98,6 +138,31 @@ UI::InputBlocking OnKeyPress(bool down, VirtualKey key) {
       }
    }
 
+   auto app = GetTmApp();
+   auto mm = cast<CTrackManiaMenus>(app.MenuManager);
+
+   // crashes TM2020
+   // mm.DialogQuickChooseGhostOpponents();
+
+   if (false) {
+
+      // these do nothing
+      // mm.DialogInputSettings_OnBindingsUnbindKey();
+      // mm.MenuConfigureInputs_OnUnbindKey();
+
+      // these are the same and have an easy to find 'unbind' button
+      // mm.DialogInGameMenuAdvanced_OnInputSettings();
+      // mm.DialogQuitRace_OnInputSettings();
+
+      print('done');
+
+      auto ila = mm.InputsList_Actions;
+
+      for (uint i = 0; i < ila.Length; i++) {
+         print("" + ila[i].StrInt1 + ": " + ila[i].StrInt2);
+      }
+   }
+
    return UI::InputBlocking::DoNothing;
 }
 
@@ -106,7 +171,13 @@ bool IsRankedOrCOTD() {
    // borrowed method for checking game mode from: https://github.com/chipsTM/tm-cotd-stats/blob/main/src/COTDStats.as
    auto app = cast<CTrackMania>(GetApp());
    auto network = cast<CTrackManiaNetwork>(app.Network);
+   if (network is null) { return false; }
    auto server_info = cast<CTrackManiaNetworkServerInfo>(network.ServerInfo);
+   if (server_info is null) { return false; }
+   // auto player_info = network.PlayerInfo;
+   // auto race_rules = network.TmRaceRules
+
+   // UIConfigMgr_Rules.UiAll.SendChat -- works
 
    // we want to allow resets when in the warm-up phase.
    // note: This seems to always be false in TM_KnockoutDaily_Online
@@ -121,8 +192,21 @@ bool IsRankedOrCOTD() {
       || (server_info.CurGameModeStr == Settings_BlockDelCustom1)
       || (server_info.CurGameModeStr == Settings_BlockDelCustom2)
       || (server_info.CurGameModeStr == Settings_BlockDelCustom3)
+      || ("*" == Settings_BlockDelCustom1)
+      || ("*" == Settings_BlockDelCustom2)
+      || ("*" == Settings_BlockDelCustom3)
       )
    );
+
+   if (app.CurrentPlayground !is null) {
+      // app.CurrentPlayground.Interface
+   }
+
+   /*
+    ? Note: We might be able to get the game mode also via:
+    ? - `ManiaPlanetScriptAPI.CurrentServerModeName`
+    ? - `MenuManager.NetworkGameModeName`
+    */
 
    if (DEV_MODE) {
       // debug: print the current game mode for gathering relevant game modes
@@ -154,3 +238,5 @@ bool IsRankedOrCOTD() {
 // TM_Teams_Online -- teams, first points to 100 by default
 // TM_Rounds_Online
 // TM_TimeAttack_Online
+// TM_Champion_Online (not sure what this is)
+// TM_Laps_Online
