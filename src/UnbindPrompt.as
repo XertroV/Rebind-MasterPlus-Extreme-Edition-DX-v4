@@ -20,33 +20,6 @@ class UnbindPrompt {
 
     // we only run this once on init
     string GetIcon(uint nonce) {
-        // string[] _icons;
-        // _icons.InsertLast(Icons::FighterJet);
-        // _icons.InsertLast(Icons::Bolt);
-        // _icons.InsertLast(Icons::Exclamation);
-        // _icons.InsertLast(Icons::Anchor);
-        // _icons.InsertLast(Icons::FireExtinguisher);
-        // _icons.InsertLast(Icons::Shield);
-        // _icons.InsertLast(Icons::Rocket);
-        // _icons.InsertLast(Icons::LevelUp);
-        // _icons.InsertLast(Icons::Rebel);
-        // _icons.InsertLast(Icons::Empire);
-        // _icons.InsertLast(Icons::SpaceShuttle);
-        // _icons.InsertLast(Icons::PaperPlane);
-        // _icons.InsertLast(Icons::Bomb);
-        // _icons.InsertLast(Icons::Heartbeat);
-        // _icons.InsertLast(Icons::Motorcycle);
-        // _icons.InsertLast(Icons::PaperPlaneO);
-        // _icons.InsertLast(Icons::BirthdayCake);
-        // _icons.InsertLast(Icons::BalanceScale);
-        // _icons.InsertLast(Icons::InternetExplorer);
-        // _icons.InsertLast(Icons::Firefox);
-        // _icons.InsertLast(Icons::FortAwesome);
-        // _icons.InsertLast(Icons::Expand);
-        // _icons.InsertLast(Icons::Sun);
-        // _icons.InsertLast(Icons::Kenney::Flag);
-        // _icons.InsertLast(Icons::Kenney::HeartO);
-
         string[] _icons = {
             Icons::FighterJet,
             Icons::Bolt,
