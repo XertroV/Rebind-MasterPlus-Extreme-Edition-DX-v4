@@ -15,16 +15,24 @@ bool Setting_Enabled = true;
 [Setting category="General" name="Show even if the UI is hidden?"]
 bool Setting_RenderIfUiHidden = true;
 
+[Setting category="General" name="Hide UI in menus and for other game modes?" description="If true, then the UI will not be shown except when it is relevant."]
+bool Setting_HideWhenIrrelevant = true;
+
+// hidden until there's a reason to have it
+[Setting category="General" name="Hide after debind?" description="Does nothing without auto-unbind/rebind feature." hidden]
+bool Setting_HideAfterDebind = true;
+
+// hidden until there's a reason to have it
 [Setting category="General" name="Key to block for 'Give up'" hidden]
 VirtualKey Setting_KeyGiveUp = VirtualKey::Delete;
 
-[Setting category="General" name="Block 'Give up' in COTD (TM_KnockoutDaily_Online)"]
+[Setting category="General" name="Show reminder when 'Give up' is bound in COTD (TM_KnockoutDaily_Online)"]
 bool Setting_BlockDelCotd = true;
 
-[Setting category="General" name="Block 'Give up' in Ranked (TM_Teams_Matchmaking_Online)"]
+[Setting category="General" name="Show reminder when 'Give up' is bound in Ranked (TM_Teams_Matchmaking_Online)"]
 bool Setting_BlockDelRanked = true;
 
-[Setting category="General" name="Block 'Give up' in Knockout (TM_Knockout_Online)"]
+[Setting category="General" name="Show reminder when 'Give up' is bound in Knockout (TM_Knockout_Online)"]
 bool Setting_BlockDelKO = true;
 
 /*
@@ -38,17 +46,14 @@ UI WINDOW
 
 */
 
-[Setting category="UI Window" name="Hide UI in menus and for other game modes?" description="If true, then the UI will not be shown except when it is relevant."]
-bool Setting_HideWhenIrrelevant = true;
+[Setting category="General" name="Window Scale" min=0.1 max=5]
+float Setting_WindowScale = 1.0;
 
-[Setting category="UI Window" name="Hide after debind?" description="Does nothing without auto-unbind/rebind feature."]
-bool Setting_HideAfterDebind = true;
-
-[Setting category="UI Window" name="Position"]
+[Setting category="General" name="Position"]
 vec2 Setting_Pos = vec2(400, 400);
 
-// [Setting category="UI Window" name="Dimensions"]
+// [Setting category="General" name="Dimensions"]
 // vec2 Setting_Dims = vec2(200 * 16 / 10, 200);
 
-[Setting category="UI Window" name="Lock Window?"]
+[Setting category="General" name="Lock Window?"]
 bool Setting_PromptLocked = false;

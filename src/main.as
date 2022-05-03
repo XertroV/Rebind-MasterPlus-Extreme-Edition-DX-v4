@@ -169,7 +169,7 @@ void CheckGiveUpBinding() {
 
 
 void OnSettingsChanged() {
-   // nothing to update
+   unbindPrompt.OnSettingsChanged();
 }
 
 void RenderMenu() {

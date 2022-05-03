@@ -7,11 +7,30 @@ const vec2 _UNBIND_WINDOW_DIMS = vec2(_width, _window_height);
 // const vec2 _UNBIND_WINDOW_DIMS = vec2(150, 75);
 const vec2 _UNBIND_TEXT_XY = vec2(_width, _width * .3);
 
+
+const float _UNBIND_TEXT_FONT_SIZE = 24.;
+const float _UNBIND_TITLE_FONT_SIZE = 20.;
+
+
+const float TAU = Math::Asin(-1) * 2;
+
+const vec4 _WHITE = vec4(1,1,1,2);
+
 enum LastAction {
     NoAction,
     UiManuallyClosed,
     // more?
 }
+
+
+vec2 _UnbindWindowDims() {
+    return _UNBIND_WINDOW_DIMS * vec2(Setting_WindowScale, 1);
+}
+
+vec2 _UnbindTextXY() {
+    return _UNBIND_TEXT_XY * Setting_WindowScale;
+}
+
 
 class UnbindPrompt {
     string sessionIcon;
@@ -68,8 +87,10 @@ class UnbindPrompt {
     UnbindPrompt() {
         // set the icon for this session.
         sessionIcon = GetIcon(Time::get_Now());
-        @btnFont = Resources::GetFont("DroidSans-Bold.ttf", 20.);
-        @inlineTitleFont = Resources::GetFont("DroidSans.ttf", 19., -1, -1, true, true);
+        @btnFont = Resources::GetFont("DroidSans-Bold.ttf", _UNBIND_TITLE_FONT_SIZE * Setting_WindowScale);
+        @inlineTitleFont = Resources::GetFont("DroidSans.ttf", _UNBIND_TEXT_FONT_SIZE * Setting_WindowScale, -1, -1, true, true);
+        // OnSettingsChanged();
+
         // set up state stuff
         OnNewMode();
     }
@@ -77,7 +98,8 @@ class UnbindPrompt {
 
     // do icon stuff to title -- simple atm but could be more complex / interesting later.
     string IconifyTitle(string _title) {
-        return sessionIcon + "  " + _title;
+        // the padding strings help the icon bit to render nicely with the other text at this font size.
+        return " " + sessionIcon + "   " + _title;
     }
 
 
@@ -113,11 +135,13 @@ class UnbindPrompt {
                    | UI::WindowFlags::NoTitleBar
                    | UI::WindowFlags::NoCollapse
                 //    | UI::WindowFlags::AlwaysAutoResize
+                   | UI::WindowFlags::NoScrollbar
+                   | UI::WindowFlags::NoScrollWithMouse
                    | UI::WindowFlags::NoResize
                    | (_locked ? (UI::WindowFlags::NoMove | UI::WindowFlags::NoResize) : 0)
                 //    | UI::WindowFlags::MenuBar
-                   | UI::WindowFlags::NoDocking;
-                // ;
+                //    | UI::WindowFlags::NoDocking
+                ;
         _flags |= UI::IsOverlayShown() ? 0 : UI::WindowFlags::NoInputs;
 
         // draw window
@@ -125,19 +149,19 @@ class UnbindPrompt {
         // UI::SetNextWindowSize(int(_dims.x), int(_dims.y), UI::Cond::FirstUseEver);
         // UI::SetNextWindowSize(800, 300);
         string _title = IconifyTitle(PLUGIN_TITLE);
+
+        // window styles
+        UI::PushStyleVar(UI::StyleVar::WindowRounding, 0.);
+
+        // window
         UI::Begin(_title, Setting_Enabled, _flags);
-        UI::SetWindowSize(_UNBIND_WINDOW_DIMS, UI::Cond::Always);
+
+        UI::SetWindowSize(_UnbindWindowDims(), UI::Cond::Always);
+
         Setting_Pos = UI::GetWindowPos();
+        Setting_Pos.x = Math::Max(0, Setting_Pos.x);
+        UI::SetWindowPos(Setting_Pos);
 
-        // update window position in settings if it's been moved
-        // if (!_locked) {
-        //     Setting_Pos = UI::GetWindowPos();
-        // }
-
-        // if(UI::BeginChild("Matches", vec2(100, 40), true)) {
-        //     UI::Text(".. matches ..");
-        //     UI::EndChild();
-        // }
         UI::BeginGroup();
             if (UI::BeginTable("header", 3, UI::TableFlags::SizingStretchProp)) {
                 UI::TableNextRow();
@@ -154,6 +178,7 @@ class UnbindPrompt {
                     // clicked hide
                     State_CurrentlyVisible = false;
                 }
+                AddSimpleTooltip("Hide until next time you should unbind.");
 
                 UI::TableNextColumn();
                 auto lockToggle = !Setting_PromptLocked ? Icons::Unlock : Icons::Lock;
@@ -161,6 +186,8 @@ class UnbindPrompt {
                     // clicked lock/unlock
                     Setting_PromptLocked = !Setting_PromptLocked;
                 }
+                // backwards order from icons (icons show state, tooltip shows function)
+                AddSimpleTooltip((!Setting_PromptLocked ? "Lock" : "Unlock") + " this window.");
 
                 UI::EndTable();
             }
@@ -171,6 +198,8 @@ class UnbindPrompt {
         DrawUnbindMain();
 
         UI::End();
+
+        UI::PopStyleVar(1);
     }
 
     void OnNewMode() {
@@ -183,9 +212,41 @@ class UnbindPrompt {
 
     void DrawUnbindMain() {
         auto _pos = Setting_Pos;
-        nvg::FontSize(_font_size);
+        auto _wDims = _UnbindWindowDims();
+        auto _ubTxtXY = _UnbindTextXY();
+
+        // bg rectangle
+        auto t = Time::get_Now() / 500.;
+        auto bgRed = Math::Sin(t) / 2. + .5;
+        // auto bgAlpha = (1 - bgRed) / 2 + .5;
+        auto bgAlpha = 1;
+        auto bgGreen = Math::Sin(t + TAU / 3) / 2. + .5;
+        auto bgBlue = Math::Sin(t + 2 * TAU / 3) / 2. + .5;
+        auto bgColor = vec4(bgRed, bgGreen, bgBlue, bgAlpha) * .8;
+
+        nvg::BeginPath();
+        nvg::Rect(_pos.x, _pos.y, _ubTxtXY.x, _wDims.y + 1.6 * _ubTxtXY.y);
+        nvg::FillColor(bgColor);
+        nvg::Fill();
+        nvg::ClosePath();
+        nvg::Reset();
+
+        nvg::StrokeColor(vec4(1, 0, 0, 0));
+        nvg::FillColor((_WHITE - bgColor) * vec4(.1, .1, .1, 1));
+        // nvg::StrokeWidth(20);
+        // nvg::Stroke();
+        nvg::FontFace(btnFont);
+        nvg::FontSize(_font_size * Setting_WindowScale);
         nvg::TextAlign(nvg::Align::Center | nvg::Align::Middle);
-        nvg::TextBox(_pos.x, _UNBIND_WINDOW_DIMS.y + _pos.y + _UNBIND_TEXT_XY.y/2, _UNBIND_TEXT_XY.x, "UNBIND\n'GIVE UP'");
+        nvg::TextBox(_pos.x, _wDims.y + _pos.y + _ubTxtXY.y/2, _ubTxtXY.x, "UNBIND\n'GIVE UP'");
+    }
+
+    void AddSimpleTooltip(string msg) {
+        if (UI::IsItemHovered()) {
+            UI::BeginTooltip();
+            UI::Text(msg);
+            UI::EndTooltip();
+        }
     }
 
 
@@ -249,5 +310,9 @@ class UnbindPrompt {
         // app.SystemOverlay.OpenInputSettings();
         // app.SystemOverlay.OpenInterfaceSettings();
         // mm.DialogInputSettings();
+    }
+
+
+    void OnSettingsChanged() {
     }
 }
