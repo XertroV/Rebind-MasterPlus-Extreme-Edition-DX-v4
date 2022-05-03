@@ -1,8 +1,11 @@
 const int _N_ICONS = 25;
 
-const vec2 _UNBIND_WINDOW_DIMS = vec2(200, 150);
+const int _width = 300;
+const float _font_size = _width / 5;
+const int _window_height = 45;
+const vec2 _UNBIND_WINDOW_DIMS = vec2(_width, _window_height);
 // const vec2 _UNBIND_WINDOW_DIMS = vec2(150, 75);
-const vec2 _UNBIND_BTN_XY = vec2(200, 60);
+const vec2 _UNBIND_TEXT_XY = vec2(_width, _width * .3);
 
 enum LastAction {
     NoAction,
@@ -17,6 +20,7 @@ class UnbindPrompt {
     LastAction lastAction = NoAction;
 
     Resources::Font@ btnFont;
+    Resources::Font@ inlineTitleFont;
 
     // we only run this once on init
     string GetIcon(uint nonce) {
@@ -66,17 +70,20 @@ class UnbindPrompt {
         // set the icon for this session.
         sessionIcon = GetIcon(Time::get_Now());
         @btnFont = Resources::GetFont("DroidSans-Bold.ttf", 20.);
+        @inlineTitleFont = Resources::GetFont("DroidSans.ttf", 19., -1, -1, true, true);
     }
 
 
     // do icon stuff to title -- simple atm but could be more complex / interesting later.
     string IconifyTitle(string _title) {
-        return sessionIcon + " " + _title;
+        return sessionIcon + "  " + _title;
     }
 
 
     void Draw() {
-        if (!Setting_Enabled || !currentlyVisible) {
+        bool appropriateMatch = IsRankedOrCOTD();
+
+        if (!appropriateMatch  || !Setting_Enabled || !currentlyVisible) {
             return;
         }
 
@@ -89,21 +96,22 @@ class UnbindPrompt {
         // auto _dims = Setting_Dims;
         auto _locked = Setting_PromptLocked;
         int _flags = 0
-                //    | UI::WindowFlags::NoTitleBar
+                   | UI::WindowFlags::NoTitleBar
                    | UI::WindowFlags::NoCollapse
                 //    | UI::WindowFlags::AlwaysAutoResize
                    | UI::WindowFlags::NoResize
                    | (_locked ? (UI::WindowFlags::NoMove | UI::WindowFlags::NoResize) : 0)
-                   | UI::WindowFlags::MenuBar
+                //    | UI::WindowFlags::MenuBar
                    | UI::WindowFlags::NoDocking;
                 // ;
         _flags |= UI::IsOverlayShown() ? 0 : UI::WindowFlags::NoInputs;
 
         // draw window
-        UI::SetNextWindowPos(int(_pos.x), int(_pos.y), UI::Cond::FirstUseEver);
+        UI::SetNextWindowPos(int(_pos.x), int(_pos.y), UI::Cond::Appearing);
         // UI::SetNextWindowSize(int(_dims.x), int(_dims.y), UI::Cond::FirstUseEver);
         // UI::SetNextWindowSize(800, 300);
-        UI::Begin(IconifyTitle(PLUGIN_TITLE), Setting_Enabled, _flags);
+        string _title = IconifyTitle(PLUGIN_TITLE);
+        UI::Begin(_title, Setting_Enabled, _flags);
         UI::SetWindowSize(_UNBIND_WINDOW_DIMS, UI::Cond::Always);
         Setting_Pos = UI::GetWindowPos();
 
@@ -117,8 +125,32 @@ class UnbindPrompt {
         //     UI::EndChild();
         // }
         UI::BeginGroup();
-            // UI::Text("test text");
-            DrawTestTable();
+            if (UI::BeginTable("header", 3, UI::TableFlags::SizingStretchProp)) {
+                UI::TableNextRow();
+
+                UI::TableNextColumn();
+                UI::PushFont(inlineTitleFont);
+                UI::Text(_title);
+                UI::PopFont();
+
+                UI::TableNextColumn();
+                // auto visibleIcon = Icons::EyeSlash;
+                auto visibleIcon = Icons::Eye;
+                if (UI::Button(visibleIcon)) {
+                    // clicked hide
+                    currentlyVisible = false;
+                }
+
+                UI::TableNextColumn();
+                auto lockToggle = !Setting_PromptLocked ? Icons::Unlock : Icons::Lock;
+                if (UI::Button(lockToggle)) {
+                    // clicked lock/unlock
+                    Setting_PromptLocked = !Setting_PromptLocked;
+                }
+
+                UI::EndTable();
+            }
+        //     // DrawTestTable();
         UI::EndGroup();
 
         // nvg stuff after ImGui, but before we End() so that we can do buttons and things, still.
@@ -127,67 +159,63 @@ class UnbindPrompt {
         UI::End();
     }
 
-
+    void OnNewMode() {
+        currentlyVisible = true;
+    }
 
     void DrawUnbindMain() {
         auto _pos = Setting_Pos;
-        nvg::FontSize(20.);
+        nvg::FontSize(_font_size);
         nvg::TextAlign(nvg::Align::Center | nvg::Align::Middle);
-        nvg::TextBox(_pos.x, _UNBIND_WINDOW_DIMS.y + _pos.y + _UNBIND_BTN_XY.y/2, _UNBIND_BTN_XY.x, "UNBIND\n'GIVE UP'");
+        nvg::TextBox(_pos.x, _UNBIND_WINDOW_DIMS.y + _pos.y + _UNBIND_TEXT_XY.y/2, _UNBIND_TEXT_XY.x, "UNBIND\n'GIVE UP'");
     }
 
 
-    void DrawTestTable() {
-        bool clickedUnbind = false;
-        UI::PushStyleVar(UI::StyleVar::ButtonTextAlign, vec2(.5, .5));
+    // void DrawTestTable() {
+    //     bool clickedUnbind = false;
+    //     UI::PushStyleVar(UI::StyleVar::ButtonTextAlign, vec2(.5, .5));
 
-        if (UI::BeginTable("header", 3, UI::TableFlags::SizingStretchProp)) {
-            UI::TableNextRow();
-            UI::TableNextColumn();
-            UI::Text("\\$ddd" + Icons::HandORight);
-            UI::TableNextColumn();
+    //     if (UI::BeginTable("header", 3, UI::TableFlags::SizingStretchProp)) {
+    //         UI::TableNextRow();
+    //         UI::TableNextColumn();
+    //         UI::Text("\\$ddd" + Icons::HandORight);
+    //         UI::TableNextColumn();
 
-            UI::PushFont(btnFont);
-            clickedUnbind = UI::Button("\\$z" + "  UNBIND \n<GIVE UP>");
-            // UI::Text("  UNBIND \n<GIVE UP>");
-            UI::PopFont();
+    //         UI::PushFont(btnFont);
+    //         clickedUnbind = UI::Button("\\$z" + "  UNBIND \n<GIVE UP>");
+    //         // UI::Text("  UNBIND \n<GIVE UP>");
+    //         UI::PopFont();
 
-            UI::TableNextColumn();
-            UI::Text("\\$ddd" + Icons::HandOLeft);
-            // UI::TableNextColumn();
-            // UI::TableNextRow();
-            // UI::TableNextRow();
-            // UI::TableNextColumn();
-            // UI::Text("\\$888" + "An author!");
-            UI::EndTable();
-        }
+    //         UI::TableNextColumn();
+    //         UI::Text("\\$ddd" + Icons::HandOLeft);
+    //         // UI::TableNextColumn();
+    //         // UI::TableNextRow();
+    //         // UI::TableNextRow();
+    //         // UI::TableNextColumn();
+    //         // UI::Text("\\$888" + "An author!");
+    //         UI::EndTable();
+    //     }
 
-        UI::PopStyleVar();
+    //     UI::PopStyleVar();
 
-        if (clickedUnbind) {
-            OnClickUnbind();
-        }
+    //     if (clickedUnbind) {
+    //         OnClickUnbind();
+    //     }
 
-        // UI::Columns(3, "UnbindButtonCols", true);
-        // UI::Text("\\$ddd" + Icons::HandORight);
-        // UI::NextColumn();
-        // UI::Text("\\$z" + "UNBIND\nGIVE UP");
-        // UI::NextColumn();
-        // UI::Text("\\$ddd" + Icons::HandOLeft);
+    //     // UI::Columns(3, "UnbindButtonCols", true);
+    //     // UI::Text("\\$ddd" + Icons::HandORight);
+    //     // UI::NextColumn();
+    //     // UI::Text("\\$z" + "UNBIND\nGIVE UP");
+    //     // UI::NextColumn();
+    //     // UI::Text("\\$ddd" + Icons::HandOLeft);
 
-        // UI::Columns(1);
+    //     // UI::Columns(1);
 
-    }
+    // }
 
 
     void RenderMenu() {
-        if (UI::MenuItem(PLUGIN_TITLE, "", Setting_Enabled)) {
-            // if (currentlyVisible) {
-            //     lastAction = LastAction::UiManuallyClosed;
-            // } else {
-            //     lastAction = LastAction::NoAction;
-            // }
-            // currentlyVisible = !currentlyVisible;
+        if (UI::MenuItem(IconifyTitle(PLUGIN_TITLE), "", Setting_Enabled)) {
             Setting_Enabled = !Setting_Enabled;
         }
     }

@@ -12,7 +12,10 @@ GENERAL
 [Setting category="General" name="Enabled?"]
 bool Setting_Enabled = true;
 
-[Setting category="General" name="Key to block for 'Give up'"]
+[Setting category="General" name="Show even if the UI is hidden?"]
+bool Setting_RenderIfUiHidden = true;
+
+[Setting category="General" name="Key to block for 'Give up'" hidden]
 VirtualKey Setting_KeyGiveUp = VirtualKey::Delete;
 
 [Setting category="General" name="Block 'Give up' in COTD (TM_KnockoutDaily_Online)"]

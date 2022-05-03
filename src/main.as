@@ -11,6 +11,9 @@ const string PLUGIN_TITLE = "Never Give Up!";
 
 string keyBoundToGiveUp;
 
+string gameMode;
+string lastGameMode;
+
 // debug function for printing members of a MwClassInfo recursively
 void _printMembers(const Reflection::MwClassInfo@ ty) {
    auto members = ty.Members;
@@ -181,7 +184,7 @@ void RenderMenu() {
 
 void _Render() {
    if (unbindPrompt !is null) {
-      // unbindPrompt.Draw();
+      unbindPrompt.Draw();
    }
 }
 
@@ -272,20 +275,27 @@ bool IsRankedOrCOTD() {
    // note: This seems to always be false in TM_KnockoutDaily_Online
    // bool isWarmUp = server_info.IsWarmUp;
    const bool isWarmUp = false;
+   bool ret = false;
 
-   bool ret = (app.CurrentPlayground !is null && !isWarmUp &&
-      ( false  // this `false` is just to make the below ORs line up nicely (for easy commenting)
-      || (Setting_BlockDelCotd   && server_info.CurGameModeStr == "TM_KnockoutDaily_Online")
-      || (Setting_BlockDelKO     && server_info.CurGameModeStr == "TM_Knockout_Online")
-      || (Setting_BlockDelRanked && server_info.CurGameModeStr == "TM_Teams_Matchmaking_Online")
-      || (server_info.CurGameModeStr == Settings_BlockDelCustom1)
-      || (server_info.CurGameModeStr == Settings_BlockDelCustom2)
-      || (server_info.CurGameModeStr == Settings_BlockDelCustom3)
-      || ("*" == Settings_BlockDelCustom1)
-      || ("*" == Settings_BlockDelCustom2)
-      || ("*" == Settings_BlockDelCustom3)
-      )
-   );
+   if (app.CurrentPlayground !is null && !isWarmUp) {
+      gameMode = server_info.CurGameModeStr;
+      ret =
+         ( false  // this `false` is just to make the below ORs line up nicely (for easy commenting)
+         || (Setting_BlockDelCotd   && gameMode == "TM_KnockoutDaily_Online")
+         || (Setting_BlockDelKO     && gameMode == "TM_Knockout_Online")
+         || (Setting_BlockDelRanked && gameMode == "TM_Teams_Matchmaking_Online")
+         || (gameMode == Settings_BlockDelCustom1)
+         || (gameMode == Settings_BlockDelCustom2)
+         || (gameMode == Settings_BlockDelCustom3)
+         || ("*" == Settings_BlockDelCustom1)
+         || ("*" == Settings_BlockDelCustom2)
+         || ("*" == Settings_BlockDelCustom3)
+         );
+      if (lastGameMode != gameMode) {
+         lastGameMode = gameMode;
+         unbindPrompt.OnNewMode();
+      }
+   }
 
    /*
     ? Note: We might be able to get the game mode also via:
