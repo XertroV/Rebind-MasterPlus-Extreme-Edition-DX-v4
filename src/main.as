@@ -9,11 +9,15 @@ const uint GIVE_UP_ACTION_INDEX = 7;
 
 const string PLUGIN_TITLE = "Never Give Up!";
 
+string keyBoundToGiveUp;
+
 // debug function for printing members of a MwClassInfo recursively
 void _printMembers(const Reflection::MwClassInfo@ ty) {
    auto members = ty.Members;
+   string extra;
    for (uint i = 0; i < members.Length; i++) {
-      print("  " + members[i].Name);
+      // extra = " (" + members[i].Members.Length + " children)";
+      print("  " + members[i].Name + extra);
    }
    if (ty.BaseType !is null) {
       _printMembers(ty.BaseType);
@@ -23,6 +27,10 @@ void _printMembers(const Reflection::MwClassInfo@ ty) {
 
 // debug function for sorta pretty-printing the members of anything that inherits from CMwNod
 void printMembers(CMwNod@ nod) {
+   if (nod is null) {
+      warn(">>> Object of type: null <<<");
+      return;
+   }
    auto ty = Reflection::TypeOf(nod);
    auto name = ty.Name;
    print("\n>>> Object of type: " + name + " <<<");
@@ -30,6 +38,17 @@ void printMembers(CMwNod@ nod) {
    _printMembers(ty);
    print("");
 }
+
+
+void printNameAndType(string varName, CMwNod@ nod) {
+   auto ty = Reflection::TypeOf(nod);
+   print("VAR/TYPE: " + varName + " :: " + (ty is null ? "null" : ty.Name));
+}
+
+
+
+
+
 
 
 CTrackMania@ GetTmApp() {
@@ -42,6 +61,8 @@ UnbindPrompt unbindPrompt;
 
 void Main() {
    auto app = GetTmApp();
+   startnew(LoopCheckBinding);
+   CheckGiveUpBinding();
 
    // ! huh, apparently we don't need to instantiate it?
    // unbindPrompt = UnbindPrompt();
@@ -60,7 +81,60 @@ void Main() {
    //    // sleep(5000);
    //    yield();
    // }
+
+   auto pg = cast<CSmArenaClient>(app.CurrentPlayground);
+   printMembers(pg);
+   // printNameAndType("app.CurrentPlayground", app.CurrentPlayground);
+   // printNameAndType("app.MenuManager", app.MenuManager);
+   while (pg is null) {
+      yield();
+   }
+   printNameAndType("pg.Interface", pg.Interface);
+   printMembers(pg.Interface);
+   // print(pg.GameTerminals.Length);
+   // printMembers(pg.GameTerminals[0]);
+   // auto player = cast<CSmPlayer>(pg.GameTerminals[0].GUIPlayer);
+   // printMembers(player);
+   // printMembers(player.ScriptAPI);
+   // auto _player = cast<CSmScriptPlayer>(player.ScriptAPI);
+   // print(_player.Speed);
+   // printMembers(pg.GameTerminals[0].ControlledPlayer);
+
+   auto pgUiConfig = cast<CGamePlaygroundUIConfig>(pg.UIConfigs[0]);
+   // pgUiConfig.SendChat("test123"); // does not work
+
+   printNameAndType("app.Network", app.Network);
+   auto network = cast<CTrackManiaNetwork>(app.Network);
+   // auto network = app.Network;
+   printMembers(network);
+   auto appPg = network.ClientManiaAppPlayground;
+   printMembers(appPg.Input);
+   // auto rules = network.TmRaceRules;
+   // printNameAndType("rules", rules);
+   // print(rules.RespawnBehaviour);
 }
+
+
+void LoopCheckBinding() {
+   while (true) {
+      // CheckGiveUpBinding();
+      sleep(1000);
+   }
+}
+
+
+void CheckGiveUpBinding() {
+   auto app = GetTmApp();
+   auto pad = app.InputPort.Script_Pads[1];
+   auto _in = app.MenuManager.MenuCustom_CurrentManiaApp.Input;
+   // auto binding = _in.GetActionBinding(pad, "Vehicle", "GiveUp");
+   // if (binding != keyBoundToGiveUp) {
+   //    keyBoundToGiveUp = binding;
+   //    print("GiveUp binding: " + keyBoundToGiveUp);
+   // }
+   // print("GiveUp binding: " + keyBoundToGiveUp);
+}
+
 
 
 void OnSettingsChanged() {
@@ -107,7 +181,7 @@ void RenderMenu() {
 
 void _Render() {
    if (unbindPrompt !is null) {
-      unbindPrompt.Draw();
+      // unbindPrompt.Draw();
    }
 }
 
@@ -126,7 +200,7 @@ UI::InputBlocking OnKeyPress(bool down, VirtualKey key) {
       return UI::InputBlocking::DoNothing;
    }
 
-   // print("Key (" + key + ") " + (down ? "pressed" : "released"));
+   print("Key (" + key + ") " + (down ? "pressed" : "released"));
 
    if (true || down) {
       // todo: handle an override key
@@ -139,35 +213,44 @@ UI::InputBlocking OnKeyPress(bool down, VirtualKey key) {
       // note: whether we check for down or not doesn't seem to matter
 
       if (down && key == Setting_KeyGiveUp && appropriateMatch) {
-         print("Blocked give up!");
-         return UI::InputBlocking::Block;
+         // print("Blocked give up!");
+         // return UI::InputBlocking::Block;
+         print("Attempting disallowing self respawn instead");
       }
    }
 
-   auto app = GetTmApp();
-   auto mm = cast<CTrackManiaMenus>(app.MenuManager);
+   // auto app = GetTmApp();
+   // auto mm = cast<CTrackManiaMenus>(app.MenuManager);
+   // auto pg = app.CurrentPlayground;
+   // auto _interface = cast<CTrackManiaRaceInterface>(pg.Interface);
+   // trace("checking interface" + (pg !is null) + (_interface !is null));
+   // if (pg !is null && _interface !is null) {
+   //    print("before, allowselfrespawn is: " + _interface.Race.AllowSelfRespawn);
+   //    _interface.Race.AllowSelfRespawn = false;
+   //    print("after, allowselfrespawn is: " + _interface.Race.AllowSelfRespawn);
+   // }
 
    // crashes TM2020
    // mm.DialogQuickChooseGhostOpponents();
 
-   if (false) {
+   // if (false) {
 
-      // these do nothing
-      // mm.DialogInputSettings_OnBindingsUnbindKey();
-      // mm.MenuConfigureInputs_OnUnbindKey();
+   //    // these do nothing
+   //    // mm.DialogInputSettings_OnBindingsUnbindKey();
+   //    // mm.MenuConfigureInputs_OnUnbindKey();
 
-      // these are the same and have an easy to find 'unbind' button
-      // mm.DialogInGameMenuAdvanced_OnInputSettings();
-      // mm.DialogQuitRace_OnInputSettings();
+   //    // these are the same and have an easy to find 'unbind' button
+   //    // mm.DialogInGameMenuAdvanced_OnInputSettings();
+   //    // mm.DialogQuitRace_OnInputSettings();
 
-      print('done');
+   //    print('done');
 
-      auto ila = mm.InputsList_Actions;
+   //    auto ila = mm.InputsList_Actions;
 
-      for (uint i = 0; i < ila.Length; i++) {
-         print("" + ila[i].StrInt1 + ": " + ila[i].StrInt2);
-      }
-   }
+   //    for (uint i = 0; i < ila.Length; i++) {
+   //       print("" + ila[i].StrInt1 + ": " + ila[i].StrInt2);
+   //    }
+   // }
 
    return UI::InputBlocking::DoNothing;
 }
@@ -203,10 +286,6 @@ bool IsRankedOrCOTD() {
       || ("*" == Settings_BlockDelCustom3)
       )
    );
-
-   if (app.CurrentPlayground !is null) {
-      // app.CurrentPlayground.Interface
-   }
 
    /*
     ? Note: We might be able to get the game mode also via:

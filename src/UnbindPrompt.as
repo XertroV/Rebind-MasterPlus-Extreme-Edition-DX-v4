@@ -165,8 +165,6 @@ class UnbindPrompt {
         UI::PopStyleVar();
 
         if (clickedUnbind) {
-            // print("clickedUnbind");
-            UI::ShowNotification("You clicked unbind give up", 1500);
             OnClickUnbind();
         }
 
@@ -196,10 +194,12 @@ class UnbindPrompt {
 
 
     void OnClickUnbind() {
+        UI::ShowNotification("You clicked unbind give up", 1500);
         auto app = GetTmApp();
         auto mm = cast<CTrackManiaMenus>(app.MenuManager);
         // mm.DialogInGameMenuAdvanced_OnInputSettings();
         // mm.DialogQuitRace_OnInputSettings();
+        // app.SystemOverlay.SwitchFullscreen();
         // app.SystemOverlay.OpenInputSettings();
         // app.SystemOverlay.OpenInterfaceSettings();
         // mm.DialogInputSettings();
