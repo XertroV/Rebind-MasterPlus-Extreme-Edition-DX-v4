@@ -39,9 +39,9 @@ UI WINDOW
 */
 
 [Setting category="UI Window" name="Hide UI in menus and for other game modes?" description="If true, then the UI will not be shown except when it is relevant."]
-bool Setting_HideWhenInactive = true;
+bool Setting_HideWhenIrrelevant = true;
 
-[Setting category="UI Window" name="Hide after debind?"]
+[Setting category="UI Window" name="Hide after debind?" description="Does nothing without auto-unbind/rebind feature."]
 bool Setting_HideAfterDebind = true;
 
 [Setting category="UI Window" name="Position"]

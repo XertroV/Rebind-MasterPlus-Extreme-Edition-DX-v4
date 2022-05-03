@@ -75,3 +75,17 @@ void RenderSettingsCustomModesTab() {
         "More fragments of game mode names can be found in:\n  Trackmania.Title.Pack.gbx/Scripts/Libs/Nadeo/TMNext/TrackMania/Modes"
     );
 }
+
+
+bool State_CurrentlyVisible = true;
+
+
+[SettingsTab name="Plugin State"]
+void RenderSettingsPluginState() {
+    State_CurrentlyVisible = UI::Checkbox("Currently visible?", State_CurrentlyVisible);
+    if (UI::IsItemHovered()) {
+        UI::BeginTooltip();
+        UI::Text("If this is false, then the prompt will be temporarily hidden for the rest of this map.");
+        UI::EndTooltip();
+    }
+}

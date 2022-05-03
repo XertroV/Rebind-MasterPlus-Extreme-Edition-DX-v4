@@ -16,7 +16,6 @@ enum LastAction {
 class UnbindPrompt {
     string sessionIcon;
 
-    bool currentlyVisible = true;
     LastAction lastAction = NoAction;
 
     Resources::Font@ btnFont;
@@ -58,7 +57,7 @@ class UnbindPrompt {
 
         if (_icons.Length != _N_ICONS) {
             string errMsg = "Assertion failed: _icons.Length != _N_ICONS (" + _icons.Length + " != " + _N_ICONS + ")";
-            error(errMsg);
+            // error(errMsg);
             throw(errMsg);
         }
 
@@ -71,6 +70,8 @@ class UnbindPrompt {
         sessionIcon = GetIcon(Time::get_Now());
         @btnFont = Resources::GetFont("DroidSans-Bold.ttf", 20.);
         @inlineTitleFont = Resources::GetFont("DroidSans.ttf", 19., -1, -1, true, true);
+        // set up state stuff
+        OnNewMode();
     }
 
 
@@ -83,7 +84,20 @@ class UnbindPrompt {
     void Draw() {
         bool appropriateMatch = IsRankedOrCOTD();
 
-        if (!appropriateMatch  || !Setting_Enabled || !currentlyVisible) {
+        bool _disabled = !Setting_Enabled;
+        bool _irrelevant = !appropriateMatch  || !State_CurrentlyVisible;
+        bool _showAnyway = !Setting_HideWhenIrrelevant && State_CurrentlyVisible;
+
+        // if (Time::get_Now() % 1000 < 10) {
+        //     dictionary@ vars = {
+        //         { "_disabled", _disabled },
+        //         { "_irrelevant", _irrelevant },
+        //         { "_showAnyway", _showAnyway }
+        //     };
+        //     print(dict2str(vars));
+        // }
+
+        if (_disabled || (_irrelevant && !_showAnyway)) {
             return;
         }
 
@@ -138,7 +152,7 @@ class UnbindPrompt {
                 auto visibleIcon = Icons::Eye;
                 if (UI::Button(visibleIcon)) {
                     // clicked hide
-                    currentlyVisible = false;
+                    State_CurrentlyVisible = false;
                 }
 
                 UI::TableNextColumn();
@@ -160,7 +174,11 @@ class UnbindPrompt {
     }
 
     void OnNewMode() {
-        currentlyVisible = true;
+        State_CurrentlyVisible = true;
+
+        // log updated gameMode
+        string p = gameMode == "" ? "<null>" : gameMode;
+        trace("Changing game mode to: " + p);
     }
 
     void DrawUnbindMain() {

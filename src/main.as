@@ -51,6 +51,27 @@ void printNameAndType(string varName, CMwNod@ nod) {
 
 
 
+bool dGetBool(dictionary@d, string k) {
+   bool ret;
+   d.Get(k, ret);
+   return ret;
+}
+
+
+const string _dictIndent = "  ";
+string dict2str(dictionary@ dict) {
+   auto ks = dict.GetKeys();
+   string[] lines;
+   for (uint i = 0; i < ks.Length; i++) {
+      lines.InsertLast(_dictIndent + "{ '" + ks[i] + "', " + dGetBool(dict, ks[i]) + " }");
+   }
+   if (lines.Length == 0) {
+      return "{ }";
+   }
+   auto body = string::Join(lines, "\n");
+   return "{\n" + body + "\n}";
+}
+
 
 
 
@@ -69,6 +90,10 @@ void Main() {
 
    // ! huh, apparently we don't need to instantiate it?
    // unbindPrompt = UnbindPrompt();
+
+   while (unbindPrompt is null) {
+      yield();
+   }
 
    // while (true) {
    //    // auto pad = app.InputPort.Script_Pads[1];
@@ -127,15 +152,18 @@ void LoopCheckBinding() {
 
 
 void CheckGiveUpBinding() {
+   return;
+
+   // exit early to disable this call
    auto app = GetTmApp();
    auto pad = app.InputPort.Script_Pads[1];
    auto _in = app.MenuManager.MenuCustom_CurrentManiaApp.Input;
-   // auto binding = _in.GetActionBinding(pad, "Vehicle", "GiveUp");
-   // if (binding != keyBoundToGiveUp) {
-   //    keyBoundToGiveUp = binding;
-   //    print("GiveUp binding: " + keyBoundToGiveUp);
-   // }
-   // print("GiveUp binding: " + keyBoundToGiveUp);
+   auto binding = _in.GetActionBinding(pad, "Vehicle", "GiveUp");
+   if (binding != keyBoundToGiveUp) {
+      keyBoundToGiveUp = binding;
+      print("GiveUp binding: " + keyBoundToGiveUp);
+   }
+   print("GiveUp binding: " + keyBoundToGiveUp);
 }
 
 
@@ -189,14 +217,31 @@ void _Render() {
 }
 
 void RenderInterface() {
-   _Render();
+   if (!Setting_RenderIfUiHidden) {
+      _Render();
+   }
 }
 
 void Render() {
-   // RenderInterface();
+   if (Setting_RenderIfUiHidden) {
+      _Render();
+   }
 }
 
 
+// This is disabled atm b/c of the bug with blocking input.
+// Possible Solutions:
+// - deal with it, if your respawning it's less of a problem
+// - figure out how to call the unbind/rebind functions in TM2020: not exposed via any Nod (I think) so would need to be done via some `Dev::*` method :/.
+//   - note: I've tried to do some reverse engineering of TM to find the function call but not much luck. I have found the reset counter and some stuff associated with the unbind dialog, tho.
+// - just call the unbind / bind dialogs instead via a button click or something
+// - just show a notification to the user when the a key is bound to "Give Up"
+//   - this we can test easily via `app.MenuManager.MenuCustom_CurrentManiaApp.Input.GetActionBinding(pad, "Vehicle", "GiveUp");`
+// Non-solutions:
+// - there are some calls like `app.SystemOverlay.OpenInputSettings()` -- all the available ones I can find do one of:
+//   - open the old settings interface (not the correct one for TM2020)
+//   - crash the game
+//   - nothing
 UI::InputBlocking OnKeyPress(bool down, VirtualKey key) {
    string actionMap = UI::CurrentActionMap();
    if (actionMap == "MenuInputsMap" || !Setting_Enabled) {
@@ -303,15 +348,15 @@ bool IsRankedOrCOTD() {
     ? - `MenuManager.NetworkGameModeName`
     */
 
-   if (DEV_MODE) {
-      // debug: print the current game mode for gathering relevant game modes
-      // we don't want to fill up the logs with 1+ lines each frame, tho, so only print at most every so many seconds.
-      uint64 now = Time::get_Now();
-      if (now - lastPrint > 5000) {
-         lastPrint = now;
-         print("CurGameModeStr = " + server_info.CurGameModeStr);
-      }
-   }
+   // if (DEV_MODE) {
+   //    // debug: print the current game mode for gathering relevant game modes
+   //    // we don't want to fill up the logs with 1+ lines each frame, tho, so only print at most every so many seconds.
+   //    uint64 now = Time::get_Now();
+   //    if (now - lastPrint > 5000) {
+   //       lastPrint = now;
+   //       print("CurGameModeStr = " + server_info.CurGameModeStr);
+   //    }
+   // }
 
    return ret;
 }
