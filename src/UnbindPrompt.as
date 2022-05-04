@@ -109,6 +109,7 @@ class UnbindPrompt {
         bool _disabled = !Setting_Enabled;
         bool _irrelevant = !appropriateMatch  || !State_CurrentlyVisible;
         bool _showAnyway = !Setting_HideWhenIrrelevant && State_CurrentlyVisible;
+        bool _giveUpNotBound = isGiveUpBound;
 
         // if (Time::get_Now() % 1000 < 10) {
         //     dictionary@ vars = {
@@ -119,7 +120,7 @@ class UnbindPrompt {
         //     print(dict2str(vars));
         // }
 
-        if (_disabled || (_irrelevant && !_showAnyway)) {
+        if (_disabled || !isGiveUpBound || (_irrelevant && !_showAnyway)) {
             return;
         }
 
@@ -211,9 +212,15 @@ class UnbindPrompt {
     }
 
     void DrawUnbindMain() {
+        nvg::Reset();
+
         auto _pos = Setting_Pos;
         auto _wDims = _UnbindWindowDims();
         auto _ubTxtXY = _UnbindTextXY();
+
+        auto mainMsgHeight = _wDims.y + 1.6 * _ubTxtXY.y;
+        auto bottomOfMainMsg = _pos.y + mainMsgHeight;
+        auto auxMsgHeight = _wDims.y;
 
         // bg rectangle
         auto t = Time::get_Now() / 500.;
@@ -225,20 +232,33 @@ class UnbindPrompt {
         auto bgColor = vec4(bgRed, bgGreen, bgBlue, bgAlpha) * .8;
 
         nvg::BeginPath();
-        nvg::Rect(_pos.x, _pos.y, _ubTxtXY.x, _wDims.y + 1.6 * _ubTxtXY.y);
+        nvg::Rect(_pos.x, _pos.y, _ubTxtXY.x, mainMsgHeight);
         nvg::FillColor(bgColor);
         nvg::Fill();
         nvg::ClosePath();
-        nvg::Reset();
 
         nvg::StrokeColor(vec4(1, 0, 0, 0));
         nvg::FillColor((_WHITE - bgColor) * vec4(.1, .1, .1, 1));
-        // nvg::StrokeWidth(20);
+        // nvg::StrokeWidth(20);  // stroke on text doens't seem to work :(
         // nvg::Stroke();
         nvg::FontFace(btnFont);
         nvg::FontSize(_font_size * Setting_WindowScale);
         nvg::TextAlign(nvg::Align::Center | nvg::Align::Middle);
         nvg::TextBox(_pos.x, _wDims.y + _pos.y + _ubTxtXY.y/2, _ubTxtXY.x, "UNBIND\n'GIVE UP'");
+
+        // msg underneath with bindings
+        nvg::BeginPath();
+        nvg::Rect(_pos.x, bottomOfMainMsg, _ubTxtXY.x, auxMsgHeight);
+        nvg::FillColor(vec4(0,0,0,.9));
+        nvg::Fill();
+        nvg::ClosePath();
+
+        // giveUpBindings
+        nvg::FillColor(_WHITE);
+        nvg::FontFace(inlineTitleFont);
+        nvg::FontSize(14 * Setting_WindowScale);
+        nvg::TextAlign(nvg::Align::Center | nvg::Align::Middle);
+        nvg::TextBox(_pos.x, bottomOfMainMsg + auxMsgHeight/2, _ubTxtXY.x, "Currently bound: " + array2str(giveUpBindings));
     }
 
     void AddSimpleTooltip(string msg) {
@@ -294,6 +314,7 @@ class UnbindPrompt {
 
 
     void RenderMenu() {
+        // todo: take out spaces from titleized
         if (UI::MenuItem(IconifyTitle(PLUGIN_TITLE), "", Setting_Enabled)) {
             Setting_Enabled = !Setting_Enabled;
         }

@@ -14,6 +14,11 @@ string keyBoundToGiveUp;
 string gameMode;
 string lastGameMode;
 
+bool isGiveUpBound;
+
+string[] giveUpBindings;
+string prevBindings = "";
+
 // debug function for printing members of a MwClassInfo recursively
 void _printMembers(const Reflection::MwClassInfo@ ty) {
    auto members = ty.Members;
@@ -73,6 +78,17 @@ string dict2str(dictionary@ dict) {
 }
 
 
+string array2str(string[] arr) {
+   string[] lines;
+   for (uint i = 0; i < arr.Length; i++) {
+      lines.InsertLast("'" + arr[i] + "'");
+   }
+   if (lines.Length == 0) {
+      return "[ ]";
+   }
+   return "[" + string::Join(lines, ", ") + "]";
+}
+
 
 
 CTrackMania@ GetTmApp() {
@@ -86,7 +102,7 @@ UnbindPrompt unbindPrompt;
 void Main() {
    auto app = GetTmApp();
    startnew(LoopCheckBinding);
-   CheckGiveUpBinding();
+   IsGiveUpBound();
 
    // ! huh, apparently we don't need to instantiate it?
    // unbindPrompt = UnbindPrompt();
@@ -145,25 +161,43 @@ void Main() {
 
 void LoopCheckBinding() {
    while (true) {
-      // CheckGiveUpBinding();
-      sleep(1000);
+      isGiveUpBound = IsGiveUpBound();
+      sleep(60); // ~16.7x per second at most
    }
 }
 
 
-void CheckGiveUpBinding() {
-   return;
-
-   // exit early to disable this call
+// hmm, this doesn't work in menus -- mb b/c GetActionBinding checks "Vehicle"?
+bool IsGiveUpBound() {
    auto app = GetTmApp();
-   auto pad = app.InputPort.Script_Pads[1];
+   auto pads = app.InputPort.Script_Pads;
    auto _in = app.MenuManager.MenuCustom_CurrentManiaApp.Input;
-   auto binding = _in.GetActionBinding(pad, "Vehicle", "GiveUp");
-   if (binding != keyBoundToGiveUp) {
-      keyBoundToGiveUp = binding;
-      print("GiveUp binding: " + keyBoundToGiveUp);
+   string binding;
+   giveUpBindings.RemoveRange(0, giveUpBindings.Length);
+   // auto curAM = UI::CurrentActionMap();
+   for (uint i = 0; i < pads.Length; i++) {
+      auto pad = app.InputPort.Script_Pads[i];
+      binding = _in.GetActionBinding(pad, "Vehicle", "GiveUp");
+      if (binding != "") {
+         giveUpBindings.InsertLast(binding);
+      }
    }
-   print("GiveUp binding: " + keyBoundToGiveUp);
+   binding = array2str(giveUpBindings);
+   if (prevBindings != binding) {
+      trace("GiveUp bindings: " + binding);
+      prevBindings = binding;
+   }
+   if (giveUpBindings.Length == 0) {
+      return false;
+   }
+   return true;
+
+   // auto binding = _in.GetActionBinding(pad, "Vehicle", "GiveUp");
+   // if (binding != keyBoundToGiveUp) {
+   //    keyBoundToGiveUp = binding;
+   //    print("GiveUp binding: " + keyBoundToGiveUp);
+   // }
+   // print("GiveUp binding: " + keyBoundToGiveUp);
 }
 
 
@@ -244,11 +278,12 @@ void Render() {
 //   - nothing
 UI::InputBlocking OnKeyPress(bool down, VirtualKey key) {
    string actionMap = UI::CurrentActionMap();
-   if (actionMap == "MenuInputsMap" || !Setting_Enabled) {
+   // if (actionMap == "MenuInputsMap" || !Setting_Enabled) {
+   if (actionMap != "Vehicle" || !Setting_Enabled) {
       return UI::InputBlocking::DoNothing;
    }
 
-   print("Key (" + key + ") " + (down ? "pressed" : "released"));
+   // print("Key (" + key + ") " + (down ? "pressed" : "released"));
 
    if (true || down) {
       // todo: handle an override key
