@@ -109,6 +109,7 @@ class UnbindPrompt {
         bool _disabled = !Setting_Enabled;
         bool _irrelevant = !appropriateMatch  || !State_CurrentlyVisible;
         bool _showAnyway = !Setting_HideWhenIrrelevant && State_CurrentlyVisible;
+        bool _inMenu = UI::CurrentActionMap() == "MenuInputsMap";
         bool _giveUpNotBound = isGiveUpBound;
 
         // if (Time::get_Now() % 1000 < 10) {
@@ -120,7 +121,7 @@ class UnbindPrompt {
         //     print(dict2str(vars));
         // }
 
-        if (_disabled || !isGiveUpBound || (_irrelevant && !_showAnyway)) {
+        if (_disabled || (!isGiveUpBound && !_inMenu) || (_irrelevant && !_showAnyway)) {
             return;
         }
 
