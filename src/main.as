@@ -1,4 +1,5 @@
 // todo: it looks like `#IF DEVELOP` is possible; not sure how yet
+// ! update: define it in info.toml -- check other projects for examples
 const bool DEV_MODE = true;
 
 // used to rate-limit game type log msgs
