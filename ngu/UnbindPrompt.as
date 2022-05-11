@@ -11,6 +11,8 @@ const vec2 _UNBIND_TEXT_XY = vec2(_width, _width * .3);
 const float _UNBIND_TEXT_FONT_SIZE = 24.;
 const float _UNBIND_TITLE_FONT_SIZE = 20.;
 
+const string unbind = "UNBIND";
+const string rebind = "REBIND";
 
 const float TAU = Math::Asin(-1) * 2;
 
@@ -20,6 +22,12 @@ enum LastAction {
     NoAction,
     UiManuallyClosed,
     // more?
+}
+
+enum ShowUI {
+    No,
+    Unbind,
+    Rebind,
 }
 
 
@@ -40,48 +48,15 @@ class UnbindPrompt {
     Resources::Font@ btnFont;
     Resources::Font@ inlineTitleFont;
 
-    // we only run this once on init
-    string GetIcon(uint nonce) {
-        string[] _icons = {
-            Icons::FighterJet,
-            Icons::Bolt,
-            Icons::Exclamation,
-            Icons::Anchor,
-            Icons::FireExtinguisher,
-            Icons::Shield,
-            Icons::Rocket,
-            Icons::LevelUp,
-            Icons::Rebel,
-            Icons::Empire,
-            Icons::SpaceShuttle,
-            Icons::PaperPlane,
-            Icons::Bomb,
-            Icons::Heartbeat,
-            Icons::Motorcycle,
-            Icons::PaperPlaneO,
-            Icons::BirthdayCake,
-            Icons::BalanceScale,
-            Icons::InternetExplorer,
-            Icons::Firefox,
-            Icons::FortAwesome,
-            Icons::Expand,
-            Icons::Sun,
-            Icons::Kenney::Flag,
-            Icons::Kenney::HeartO
-        };
+    // flag to track whether giveup was bound last frame
+    bool last_giveUpBound = true;
+    // flag for tracking if we unbound giveUp this map/session
+    bool session_giveUpUnbound = false;
 
-        // print("_icons.Length: " + _icons.Length);
-        // print("nonce: " + nonce);
-        // print("nonce % _N_ICONS: " + nonce % _N_ICONS);
-
-        if (_icons.Length != _N_ICONS) {
-            string errMsg = "Assertion failed: _icons.Length != _N_ICONS (" + _icons.Length + " != " + _N_ICONS + ")";
-            // error(errMsg);
-            throw(errMsg);
-        }
-
-        // assume the nonce was random enough and take the mod to pick an icon.
-        return _icons[nonce % _N_ICONS];
+    // todo
+    ShowUI ShouldShowUI() {
+        // show the UI when: we need to unbind or rebind giveup
+        return ShowUI::No;
     }
 
     UnbindPrompt() {
@@ -89,7 +64,6 @@ class UnbindPrompt {
         sessionIcon = GetIcon(Time::get_Now());
         @btnFont = Resources::GetFont("DroidSans-Bold.ttf", _UNBIND_TITLE_FONT_SIZE * Setting_WindowScale);
         @inlineTitleFont = Resources::GetFont("DroidSans.ttf", _UNBIND_TEXT_FONT_SIZE * Setting_WindowScale, -1, -1, true, true);
-        // OnSettingsChanged();
 
         // set up state stuff
         OnNewMode();
@@ -97,20 +71,31 @@ class UnbindPrompt {
 
 
     // do icon stuff to title -- simple atm but could be more complex / interesting later.
-    string IconifyTitle(string _title) {
-        // the padding strings help the icon bit to render nicely with the other text at this font size.
-        return " " + sessionIcon + "   " + _title;
+    string IconifyTitle(string _title, bool addPadding = false) {
+        if (addPadding) {
+            // the padding strings help the icon bit to render nicely with the other text at this font size.
+            return " " + sessionIcon + "   " + _title;
+        }
+        return sessionIcon + " " + _title;
     }
 
-
     void Draw() {
+        // never draw if disabled or not currently visible
+        if (!Setting_Enabled || !State_CurrentlyVisible) {
+            return;
+        }
+
         bool appropriateMatch = IsRankedOrCOTD();
 
-        bool _disabled = !Setting_Enabled;
-        bool _irrelevant = !appropriateMatch  || !State_CurrentlyVisible;
+        bool _irrelevant = !appropriateMatch || !State_CurrentlyVisible;
         bool _showAnyway = !Setting_HideWhenIrrelevant && State_CurrentlyVisible;
-        bool _inMenu = UI::CurrentActionMap() == "MenuInputsMap";
-        bool _giveUpNotBound = isGiveUpBound;
+        bool _inMenu = UI::CurrentActionMap() == "MenuInputsMap" && getServerInfo() is null;
+
+        if (last_giveUpBound && !isGiveUpBound) {
+            session_giveUpUnbound = true;
+        }
+
+        last_giveUpBound = isGiveUpBound;
 
         // if (Time::get_Now() % 1000 < 10) {
         //     dictionary@ vars = {
@@ -121,7 +106,8 @@ class UnbindPrompt {
         //     print(dict2str(vars));
         // }
 
-        if (_disabled || (!isGiveUpBound && !_inMenu) || (_irrelevant && !_showAnyway)) {
+        // todo: window shows up in menu of relevant game mode even with no binding (shows binding: [])
+        if (((!isGiveUpBound && !_inMenu) || _irrelevant) && !_showAnyway) {
             return;
         }
 
@@ -150,7 +136,7 @@ class UnbindPrompt {
         UI::SetNextWindowPos(int(_pos.x), int(_pos.y), UI::Cond::Appearing);
         // UI::SetNextWindowSize(int(_dims.x), int(_dims.y), UI::Cond::FirstUseEver);
         // UI::SetNextWindowSize(800, 300);
-        string _title = IconifyTitle(PLUGIN_TITLE);
+        string _title = IconifyTitle(PLUGIN_TITLE, true);
 
         // window styles
         UI::PushStyleVar(UI::StyleVar::WindowRounding, 0.);
@@ -184,7 +170,8 @@ class UnbindPrompt {
 
                 UI::TableNextColumn();
                 auto lockToggle = !Setting_PromptLocked ? Icons::Unlock : Icons::Lock;
-                if (UI::Button(lockToggle)) {
+                auto lockToggleBtn = UI::Button(lockToggle);
+                if (lockToggleBtn) {
                     // clicked lock/unlock
                     Setting_PromptLocked = !Setting_PromptLocked;
                 }
@@ -221,7 +208,7 @@ class UnbindPrompt {
 
         auto mainMsgHeight = _wDims.y + 1.6 * _ubTxtXY.y;
         auto bottomOfMainMsg = _pos.y + mainMsgHeight;
-        auto auxMsgHeight = _wDims.y;
+        auto auxMsgHeight = _wDims.y / 2 * Setting_WindowScale;
 
         // bg rectangle
         auto t = Time::get_Now() / 500.;
@@ -245,7 +232,7 @@ class UnbindPrompt {
         nvg::FontFace(btnFont);
         nvg::FontSize(_font_size * Setting_WindowScale);
         nvg::TextAlign(nvg::Align::Center | nvg::Align::Middle);
-        nvg::TextBox(_pos.x, _wDims.y + _pos.y + _ubTxtXY.y/2, _ubTxtXY.x, "UNBIND\n'GIVE UP'");
+        nvg::TextBox(_pos.x, _wDims.y + _pos.y + _ubTxtXY.y/2, _ubTxtXY.x, unbind + "\n'GIVE UP'");
 
         // msg underneath with bindings
         nvg::BeginPath();
@@ -261,15 +248,6 @@ class UnbindPrompt {
         nvg::TextAlign(nvg::Align::Center | nvg::Align::Middle);
         nvg::TextBox(_pos.x, bottomOfMainMsg + auxMsgHeight/2, _ubTxtXY.x, "Currently bound: " + array2str(giveUpBindings));
     }
-
-    void AddSimpleTooltip(string msg) {
-        if (UI::IsItemHovered()) {
-            UI::BeginTooltip();
-            UI::Text(msg);
-            UI::EndTooltip();
-        }
-    }
-
 
     // void DrawTestTable() {
     //     bool clickedUnbind = false;
@@ -337,4 +315,55 @@ class UnbindPrompt {
 
     void OnSettingsChanged() {
     }
+
+
+    /*
+    Other functions
+    */
+
+
+    // we only run this once on init
+    string GetIcon(uint nonce) {
+        string[] _icons = {
+            Icons::FighterJet,
+            Icons::Bolt,
+            Icons::Exclamation,
+            Icons::Anchor,
+            Icons::FireExtinguisher,
+            Icons::Shield,
+            Icons::Rocket,
+            Icons::LevelUp,
+            Icons::Rebel,
+            Icons::Empire,
+            Icons::SpaceShuttle,
+            Icons::PaperPlane,
+            Icons::Bomb,
+            Icons::Heartbeat,
+            Icons::Motorcycle,
+            Icons::PaperPlaneO,
+            Icons::BirthdayCake,
+            Icons::BalanceScale,
+            Icons::InternetExplorer,
+            Icons::Firefox,
+            Icons::FortAwesome,
+            Icons::Expand,
+            Icons::Sun,
+            Icons::Kenney::Flag,
+            Icons::Kenney::HeartO
+        };
+
+        // print("_icons.Length: " + _icons.Length);
+        // print("nonce: " + nonce);
+        // print("nonce % _N_ICONS: " + nonce % _N_ICONS);
+
+        if (_icons.Length != _N_ICONS) {
+            string errMsg = "Assertion failed: _icons.Length != _N_ICONS (" + _icons.Length + " != " + _N_ICONS + ")";
+            // error(errMsg);
+            throw(errMsg);
+        }
+
+        // assume the nonce was random enough and take the mod to pick an icon.
+        return _icons[nonce % _N_ICONS];
+    }
+
 }

@@ -128,14 +128,14 @@ void Main() {
    // }
 
    auto pg = cast<CSmArenaClient>(app.CurrentPlayground);
-   printMembers(pg);
+   // printMembers(pg);
    // printNameAndType("app.CurrentPlayground", app.CurrentPlayground);
    // printNameAndType("app.MenuManager", app.MenuManager);
    while (pg is null) {
       yield();
    }
-   printNameAndType("pg.Interface", pg.Interface);
-   printMembers(pg.Interface);
+   // printNameAndType("pg.Interface", pg.Interface);
+   // printMembers(pg.Interface);
    // print(pg.GameTerminals.Length);
    // printMembers(pg.GameTerminals[0]);
    // auto player = cast<CSmPlayer>(pg.GameTerminals[0].GUIPlayer);
@@ -148,12 +148,12 @@ void Main() {
    auto pgUiConfig = cast<CGamePlaygroundUIConfig>(pg.UIConfigs[0]);
    // pgUiConfig.SendChat("test123"); // does not work
 
-   printNameAndType("app.Network", app.Network);
+   // printNameAndType("app.Network", app.Network);
    auto network = cast<CTrackManiaNetwork>(app.Network);
    // auto network = app.Network;
-   printMembers(network);
+   // printMembers(network);
    auto appPg = network.ClientManiaAppPlayground;
-   printMembers(appPg.Input);
+   // printMembers(appPg.Input);
    // auto rules = network.TmRaceRules;
    // printNameAndType("rules", rules);
    // print(rules.RespawnBehaviour);
@@ -337,6 +337,15 @@ UI::InputBlocking OnKeyPress(bool down, VirtualKey key) {
    // }
 
    return UI::InputBlocking::DoNothing;
+}
+
+
+CTrackManiaNetwork@ getNetwork() {
+   return cast<CTrackManiaNetwork>(GetTmApp().Network);
+}
+
+CTrackManiaNetworkServerInfo@ getServerInfo() {
+   return cast<CTrackManiaNetworkServerInfo>(getNetwork().ServerInfo);
 }
 
 
