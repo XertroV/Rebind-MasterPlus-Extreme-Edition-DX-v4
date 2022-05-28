@@ -7,3 +7,4 @@ License: MIT
 GL HF
 
 ![Gif demo](never-give-up-demo-loop.gif)
+![Gif demo](never-give-up-demo-loop.webm)
