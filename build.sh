@@ -62,7 +62,6 @@ for pluginSrc in ${pluginSources[@]}; do
       mkdir -p $_build_dest/
       rm -vr $_build_dest/*
       cp -LR -v ./$pluginSrc/* $_build_dest/
-      # cp -a -v ./utils $_build_dest/
       _copy_exit_code="$?"
       sed -i 's/^\(name[ \t="]*\)\(.*\)"/\1\2 (Dev)"/' $_build_dest/info.toml
       export PLUGIN_PRETTY_NAME="${PLUGIN_PRETTY_NAME} \(Dev\)"
