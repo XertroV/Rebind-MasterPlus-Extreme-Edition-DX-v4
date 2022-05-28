@@ -1,5 +1,15 @@
 # Never Give Up (Openplanet Plugin for TM2020)
 
+This plugin will show you a high-visibility reminder prompt to unbind 'Give Up' in COTD (and ranked) and will automatically disappear when 'Give Up' is unbound.
+
+You can easily hide the prompt with one-click if you want it to go away for that session. (It will show up again the next time you're in an appropriate game mode.)
+
+You can optionally set additional game modes.
+
+Currently, it does not remind you to re-bind 'Give Up', but you notice pretty quickly next time you try to use it.
+
+Ideally in the future the plugin could re-bind 'Give Up' to respawn automatically and temporarily, so no user action is required. That is not trivial to do currently, though.
+
 Repo: https://github.com/XertroV/tm-never-give-up
 
 License: MIT

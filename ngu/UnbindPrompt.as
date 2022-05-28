@@ -106,7 +106,6 @@ class UnbindPrompt {
         //     print(dict2str(vars));
         // }
 
-        // todo: window shows up in menu of relevant game mode even with no binding (shows binding: [])
         if (((!isGiveUpBound && !_inMenu) || _irrelevant) && !_showAnyway) {
             return;
         }
