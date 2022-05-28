@@ -97,7 +97,7 @@ CTrackMania@ GetTmApp() {
 }
 
 
-UnbindPrompt unbindPrompt;
+UnbindPrompt unbindPrompt = UnbindPrompt();
 
 
 void Main() {
@@ -105,58 +105,14 @@ void Main() {
    startnew(LoopCheckBinding);
    IsGiveUpBound();
 
-   // ! huh, apparently we don't need to instantiate it?
-   // unbindPrompt = UnbindPrompt();
-
    while (unbindPrompt is null) {
       yield();
    }
 
-   // while (true) {
-   //    // auto pad = app.InputPort.Script_Pads[1];
-   //    // auto _in = app.MenuManager.MenuCustom_CurrentManiaApp.Input;
-   //    // auto dn = _in.GetActionDisplayName("Vehicle", "GiveUp");  // => "Give Up"
-   //    // auto binding = _in.GetActionBinding(pad, "Vehicle", "GiveUp");  // => "Delete"
-   //    // // print(tostring(binding));
-   //    // // app.MenuManager.DialogInputSettings();
-   //    // // app.MenuManager.MenuConfigureInputs();
-   //    // // printMembers(app.MenuManager);
-   //    // // app.MenuManager.MenuStatistics();
-   //    // // app.MenuManager.MenuCampaignChallenges();
-   //    // sleep(5000);
-   //    yield();
-   // }
-
    auto pg = cast<CSmArenaClient>(app.CurrentPlayground);
-   // printMembers(pg);
-   // printNameAndType("app.CurrentPlayground", app.CurrentPlayground);
-   // printNameAndType("app.MenuManager", app.MenuManager);
    while (pg is null) {
       yield();
    }
-   // printNameAndType("pg.Interface", pg.Interface);
-   // printMembers(pg.Interface);
-   // print(pg.GameTerminals.Length);
-   // printMembers(pg.GameTerminals[0]);
-   // auto player = cast<CSmPlayer>(pg.GameTerminals[0].GUIPlayer);
-   // printMembers(player);
-   // printMembers(player.ScriptAPI);
-   // auto _player = cast<CSmScriptPlayer>(player.ScriptAPI);
-   // print(_player.Speed);
-   // printMembers(pg.GameTerminals[0].ControlledPlayer);
-
-   auto pgUiConfig = cast<CGamePlaygroundUIConfig>(pg.UIConfigs[0]);
-   // pgUiConfig.SendChat("test123"); // does not work
-
-   // printNameAndType("app.Network", app.Network);
-   auto network = cast<CTrackManiaNetwork>(app.Network);
-   // auto network = app.Network;
-   // printMembers(network);
-   auto appPg = network.ClientManiaAppPlayground;
-   // printMembers(appPg.Input);
-   // auto rules = network.TmRaceRules;
-   // printNameAndType("rules", rules);
-   // print(rules.RespawnBehaviour);
 }
 
 
@@ -192,13 +148,6 @@ bool IsGiveUpBound() {
       return false;
    }
    return true;
-
-   // auto binding = _in.GetActionBinding(pad, "Vehicle", "GiveUp");
-   // if (binding != keyBoundToGiveUp) {
-   //    keyBoundToGiveUp = binding;
-   //    print("GiveUp binding: " + keyBoundToGiveUp);
-   // }
-   // print("GiveUp binding: " + keyBoundToGiveUp);
 }
 
 
@@ -208,47 +157,14 @@ void OnSettingsChanged() {
 }
 
 void RenderMenu() {
-   // bool clickedMenu = UI::MenuItem("TestMenu");
-   // if (clickedMenu) {
-   //    print("clickedMenu = true");
-   // }
    auto app = GetTmApp();
    auto mm = cast<CTrackManiaMenus>(app.MenuManager);
-   // if (UI::MenuItem("MenuTest: Main")) {
-   //    mm.MenuMain();
-   // }
-   // if (UI::MenuItem("MenuTest: Profile")) {
-   //    mm.MenuProfile();
-   // }
-   // if (UI::MenuItem("MenuMultiPlayerNetworkCreate")) {
-   //    mm.MenuMultiPlayerNetworkCreate();
-   // }
-   // if (UI::MenuItem("MenuHotSeatCreate")) {
-   //    mm.MenuHotSeatCreate();
-   // }
-   // if (UI::MenuItem("MenuConfigureInputs")) {
-   //    mm.MenuConfigureInputs();
-   // }
-   // if (UI::MenuItem("MenuProfileAdvanced")) {
-   //    mm.MenuProfileAdvanced();
-   // }
-   // if (UI::MenuItem("MenuProfile_Launch")) {
-   //    mm.MenuProfile_Launch();
-   // }
-   // if (UI::MenuItem("DialogChooseLeague")) {
-   //    mm.DialogChooseLeague();
-   // }
-
-   if (unbindPrompt !is null) {
-      unbindPrompt.RenderMenu();
-   }
+   unbindPrompt.RenderMenu();
 }
 
 
 void _Render() {
-   if (unbindPrompt !is null) {
-      unbindPrompt.Draw();
-   }
+   unbindPrompt.Draw();
 }
 
 void RenderInterface() {
@@ -278,6 +194,8 @@ void Render() {
 //   - crash the game
 //   - nothing
 UI::InputBlocking OnKeyPress(bool down, VirtualKey key) {
+   return UI::InputBlocking::DoNothing;
+   /*
    string actionMap = UI::CurrentActionMap();
    // if (actionMap == "MenuInputsMap" || !Setting_Enabled) {
    if (actionMap != "Vehicle" || !Setting_Enabled) {
@@ -302,41 +220,8 @@ UI::InputBlocking OnKeyPress(bool down, VirtualKey key) {
          print("Attempting disallowing self respawn instead");
       }
    }
-
-   // auto app = GetTmApp();
-   // auto mm = cast<CTrackManiaMenus>(app.MenuManager);
-   // auto pg = app.CurrentPlayground;
-   // auto _interface = cast<CTrackManiaRaceInterface>(pg.Interface);
-   // trace("checking interface" + (pg !is null) + (_interface !is null));
-   // if (pg !is null && _interface !is null) {
-   //    print("before, allowselfrespawn is: " + _interface.Race.AllowSelfRespawn);
-   //    _interface.Race.AllowSelfRespawn = false;
-   //    print("after, allowselfrespawn is: " + _interface.Race.AllowSelfRespawn);
-   // }
-
-   // crashes TM2020
-   // mm.DialogQuickChooseGhostOpponents();
-
-   // if (false) {
-
-   //    // these do nothing
-   //    // mm.DialogInputSettings_OnBindingsUnbindKey();
-   //    // mm.MenuConfigureInputs_OnUnbindKey();
-
-   //    // these are the same and have an easy to find 'unbind' button
-   //    // mm.DialogInGameMenuAdvanced_OnInputSettings();
-   //    // mm.DialogQuitRace_OnInputSettings();
-
-   //    print('done');
-
-   //    auto ila = mm.InputsList_Actions;
-
-   //    for (uint i = 0; i < ila.Length; i++) {
-   //       print("" + ila[i].StrInt1 + ": " + ila[i].StrInt2);
-   //    }
-   // }
-
    return UI::InputBlocking::DoNothing;
+   */
 }
 
 
@@ -356,10 +241,6 @@ bool IsRankedOrCOTD() {
    if (network is null) { return false; }
    auto server_info = cast<CTrackManiaNetworkServerInfo>(network.ServerInfo);
    if (server_info is null) { return false; }
-   // auto player_info = network.PlayerInfo;
-   // auto race_rules = network.TmRaceRules
-
-   // UIConfigMgr_Rules.UiAll.SendChat -- works
 
    // we want to allow resets when in the warm-up phase.
    // note: This seems to always be false in TM_KnockoutDaily_Online

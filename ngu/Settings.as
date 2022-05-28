@@ -46,11 +46,11 @@ UI WINDOW
 
 */
 
-[Setting category="General" name="Window Scale" min=0.1 max=5]
-float Setting_WindowScale = 1.0;
+[Setting category="General" name="Window Scale" min=1.0 max=5]
+float Setting_WindowScale = 2.0;
 
 [Setting category="General" name="Position"]
-vec2 Setting_Pos = vec2(400, 400);
+vec2 Setting_Pos = vec2(200, 66);
 
 // [Setting category="General" name="Dimensions"]
 // vec2 Setting_Dims = vec2(200 * 16 / 10, 200);

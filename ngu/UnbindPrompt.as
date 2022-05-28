@@ -63,7 +63,7 @@ class UnbindPrompt {
         // set the icon for this session.
         sessionIcon = GetIcon(Time::get_Now());
         @btnFont = Resources::GetFont("DroidSans-Bold.ttf", _UNBIND_TITLE_FONT_SIZE * Setting_WindowScale);
-        @inlineTitleFont = Resources::GetFont("DroidSans.ttf", _UNBIND_TEXT_FONT_SIZE * Setting_WindowScale, -1, -1, true, true);
+        @inlineTitleFont = Resources::GetFont("DroidSans.ttf", _UNBIND_TEXT_FONT_SIZE, -1, -1, true, true);
 
         // set up state stuff
         OnNewMode();
