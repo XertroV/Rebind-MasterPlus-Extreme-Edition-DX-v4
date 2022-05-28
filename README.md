@@ -11,6 +11,6 @@ GL HF
 
 https://user-images.githubusercontent.com/1046448/170809715-6bfb2a73-923a-4b17-898c-4c2087854dbd.mp4
 
-<video width="460" height="300" controls autoplay loop muted>
+<!-- <video width="460" height="300" controls autoplay loop muted>
     <source src="https://user-images.githubusercontent.com/1046448/170809715-6bfb2a73-923a-4b17-898c-4c2087854dbd.mp4" type="video/mp4">
-</video>
+</video> -->

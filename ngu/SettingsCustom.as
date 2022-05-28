@@ -58,7 +58,7 @@ void RenderSettingsCustomModesTab() {
     UI::Separator();
 
     UI::TextWrapped(
-        "Known game modes:\n"
+        "Example game modes:\n"
         "- TM_Campaign_Local\n"
         "- TM_Cup_Online\n"
         "- TM_Laps_Online\n"
@@ -71,8 +71,6 @@ void RenderSettingsCustomModesTab() {
         "- TM_KnockoutDaily_Online (COTD KO rounds)\n"
         "- TM_TimeAttackDaily_Online (COTD qualifier)\n"
         "- TM_Teams_Matchmaking_Online (Ranked)\n"
-        "\n"
-        "More fragments of game mode names can be found in:\n  Trackmania.Title.Pack.gbx/Scripts/Libs/Nadeo/TMNext/TrackMania/Modes"
     );
 }
 
