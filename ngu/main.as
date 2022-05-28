@@ -101,6 +101,7 @@ UnbindPrompt unbindPrompt = UnbindPrompt();
 
 
 void Main() {
+#if TMNEXT
    auto app = GetTmApp();
    startnew(LoopCheckBinding);
    IsGiveUpBound();
@@ -113,6 +114,9 @@ void Main() {
    while (pg is null) {
       yield();
    }
+#else
+   warn("Never Give Up is only compatible with TM2020. It doesn't do anything in other games.");
+#endif
 }
 
 

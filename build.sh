@@ -16,7 +16,8 @@ esac
 
 _colortext16 yellow "🚩 Build mode: $_build_mode"
 
-pluginSources=( 'ngu' 'royal-info' )
+# pluginSources=( 'ngu' 'royal-info' )
+pluginSources=( 'ngu' )
 
 for pluginSrc in ${pluginSources[@]}; do
   # if we don't have `dos2unix` below then we need to add `\r` to the `tr -d`
