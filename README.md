@@ -5,3 +5,5 @@ Repo: https://github.com/XertroV/tm-never-give-up
 License: MIT
 
 GL HF
+
+![Gif demo](never-give-up-demo-loop.gif)
