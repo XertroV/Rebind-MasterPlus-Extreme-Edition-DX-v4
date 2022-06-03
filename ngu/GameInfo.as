@@ -12,6 +12,12 @@ class GameInfo {
         return cast<CTrackManiaNetworkServerInfo>(GetNetwork().ServerInfo);
     }
 
+    bool PlaygroundIsNull() {
+        auto network = GetNetwork();
+        return network.ClientManiaAppPlayground is null
+            || network.ClientManiaAppPlayground.Playground is null;
+    }
+
     bool PlaygroundNotNull() {
         auto network = GetNetwork();
         return network.ClientManiaAppPlayground !is null
@@ -38,6 +44,11 @@ class GameInfo {
         auto mpsapi = GetManiaPlanetScriptApi();
         mpsapi.Dialog_BindInput(ActionIndex, Device);
     }
+
+    /* does not work or do anything */
+    // void UnbindInput(CInputScriptPad@ pad) {
+    //     GetManiaPlanetScriptApi().Dialog_UnbindInputDevice(pad);
+    // }
 
     /* Utility Functions */
 

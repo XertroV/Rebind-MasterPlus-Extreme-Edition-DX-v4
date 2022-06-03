@@ -91,6 +91,7 @@ class UnbindPrompt {
 
         bool appropriateMatch = IsRankedOrCOTD();
         bool inGame = gi.InGame();
+        bool inMenu = UI::CurrentActionMap() == "MenuInputsMap" && gi.PlaygroundIsNull();
 
         /* to start with, we want to show if we're in an appropriate match + bound */
         show = show || (appropriateMatch && isGiveUpBound);
@@ -98,15 +99,16 @@ class UnbindPrompt {
         /* show if we are in a game-mode that we should have giveUp bound but it is not. */
         show = show || (inGame && !appropriateMatch && !isGiveUpBound);
 
-        /* even if irrelevant we show with this setting */
+        show = show || (inMenu && !isGiveUpBound);
+
+        /* show always if this is false */
         show = show || !Setting_HideWhenIrrelevant;
 
         // bool _irrelevant = !appropriateMatch || !State_CurrentlyVisible;
         // bool _showAnyway = !Setting_HideWhenIrrelevant && State_CurrentlyVisible;
 
-        bool _inMenu = UI::CurrentActionMap() == "MenuInputsMap" && !gi.PlaygroundNotNull();
         /* only show in menu if Setting_HideWhenIrrelevant = false; */
-        show = (show && !_inMenu) || (show && _inMenu && !Setting_HideWhenIrrelevant);
+        // show = (show && !_inMenu) || (show && _inMenu && !Setting_HideWhenIrrelevant);
 
         if (last_giveUpBound && !isGiveUpBound) {
             session_giveUpUnbound = true;
@@ -123,10 +125,6 @@ class UnbindPrompt {
         //     print(dict2str(vars));
         // }
 
-
-        // if (((!isGiveUpBound && !_inMenu) || _irrelevant) && !_showAnyway) {
-        //     return;
-        // }
         if (!show) return;
 
         auto app = GetTmApp();
@@ -183,6 +181,7 @@ class UnbindPrompt {
                     if (isGiveUpBound) {
                         auto pad = GetPadWithGiveUpBound();
                         gi.BindInput(RESET_ACTION_INDEX, pad);
+                        // gi.UnbindInput(pad);
                     } else {
                         auto pad = GetFirstPadGiveUpBoundOrDefault();
                         gi.BindInput(GIVE_UP_ACTION_INDEX, pad);
@@ -263,7 +262,7 @@ class UnbindPrompt {
         nvg::FontFace(btnFont);
         nvg::FontSize(_font_size * Setting_WindowScale);
         nvg::TextAlign(nvg::Align::Center | nvg::Align::Middle);
-        nvg::TextBox(_pos.x, _wDims.y + _pos.y + _ubTxtXY.y/2, _ubTxtXY.x, unbind + "\n'GIVE UP'");
+        nvg::TextBox(_pos.x, _wDims.y + _pos.y + _ubTxtXY.y/2, _ubTxtXY.x, (isGiveUpBound ? unbind : rebind) + "\n'GIVE UP'");
 
         // msg underneath with bindings
         nvg::BeginPath();

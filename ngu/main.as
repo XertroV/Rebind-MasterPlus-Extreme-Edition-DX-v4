@@ -111,10 +111,15 @@ void Main() {
       yield();
    }
 
+#if DEV
+   DebugPrintBindings();
+#endif
+
    auto pg = cast<CSmArenaClient>(app.CurrentPlayground);
    while (pg is null) {
       yield();
    }
+
 #else
    warn("Never Give Up is only compatible with TM2020. It doesn't do anything in other games.");
 #endif
@@ -128,9 +133,18 @@ void LoopCheckBinding() {
    }
 }
 
+bool IsGiveUpBound() {
+   string currBindings = string(GameInfo().GetManiaPlanetScriptApi().InputBindings_Bindings[7]);
+   giveUpBindings.RemoveRange(0, giveUpBindings.Length);
+   if (currBindings.Length > 0) {
+      giveUpBindings.InsertLast(currBindings);
+      return true;
+   }
+   return false;
+}
 
 // hmm, this doesn't work in menus -- mb b/c GetActionBinding checks "Vehicle"?
-bool IsGiveUpBound() {
+bool IsGiveUpBoundAux() {
    auto app = GetTmApp();
    auto pads = app.InputPort.Script_Pads;
    auto _in = app.MenuManager.MenuCustom_CurrentManiaApp.Input;
@@ -347,3 +361,12 @@ bool IsRankedOrCOTD() {
 // TM_TimeAttack_Online
 // TM_Champion_Online (not sure what this is)
 // TM_Laps_Online
+
+void DebugPrintBindings() {
+   print("\\$29f" + 'Bindings:');
+   MwFastBuffer<wstring> bs = GameInfo().GetManiaPlanetScriptApi().InputBindings_Bindings;
+   MwFastBuffer<wstring> as = GameInfo().GetManiaPlanetScriptApi().InputBindings_ActionNames;
+   for (uint i = 0; i < bs.Length; i++) {
+      print("  \\$39f" + string(as[i]) + ": " + string(bs[i]));
+   }
+}

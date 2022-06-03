@@ -3,3 +3,6 @@ name        = "Never Give Up"
 author      = "XertroV"
 category    = "Race"
 version     = "0.1.3"
+
+[script]
+defines     = [ "DEV" ]

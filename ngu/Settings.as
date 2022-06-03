@@ -15,7 +15,7 @@ bool Setting_Enabled = true;
 [Setting category="General" name="Show even if the UI is hidden?"]
 bool Setting_RenderIfUiHidden = true;
 
-[Setting category="General" name="Hide UI in menus and for other game modes?" description="If true, then the UI will not be shown except when it is relevant."]
+[Setting category="General" name="Hide UI in menus and for other game modes?" description="If true, then the UI only be shown when it is relevant."]
 bool Setting_HideWhenIrrelevant = true;
 
 // hidden until there's a reason to have it
