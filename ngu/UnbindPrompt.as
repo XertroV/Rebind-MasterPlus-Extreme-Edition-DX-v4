@@ -104,32 +104,15 @@ class UnbindPrompt {
         /* show always if this is false */
         show = show || !Setting_HideWhenIrrelevant;
 
-        // bool _irrelevant = !appropriateMatch || !State_CurrentlyVisible;
-        // bool _showAnyway = !Setting_HideWhenIrrelevant && State_CurrentlyVisible;
-
-        /* only show in menu if Setting_HideWhenIrrelevant = false; */
-        // show = (show && !_inMenu) || (show && _inMenu && !Setting_HideWhenIrrelevant);
-
         if (last_giveUpBound && !isGiveUpBound) {
             session_giveUpUnbound = true;
         }
 
         last_giveUpBound = isGiveUpBound;
 
-        // if (Time::get_Now() % 1000 < 10) {
-        //     dictionary@ vars = {
-        //         { "_disabled", _disabled },
-        //         { "_irrelevant", _irrelevant },
-        //         { "_showAnyway", _showAnyway }
-        //     };
-        //     print(dict2str(vars));
-        // }
-
         if (!show) return;
 
         auto app = GetTmApp();
-
-        // print("draw unbind");
 
         // setup -- settings and prep flags
         auto _pos = Setting_Pos;
@@ -210,7 +193,6 @@ class UnbindPrompt {
 
                 UI::EndTable();
             }
-        //     // DrawTestTable();
         UI::EndGroup();
 
         // nvg stuff after ImGui, but before we End() so that we can do buttons and things, still.
@@ -279,67 +261,11 @@ class UnbindPrompt {
         nvg::TextBox(_pos.x, bottomOfMainMsg + auxMsgHeight/2, _ubTxtXY.x, "Currently bound: " + array2str(giveUpBindings));
     }
 
-    // void DrawTestTable() {
-    //     bool clickedUnbind = false;
-    //     UI::PushStyleVar(UI::StyleVar::ButtonTextAlign, vec2(.5, .5));
-
-    //     if (UI::BeginTable("header", 3, UI::TableFlags::SizingStretchProp)) {
-    //         UI::TableNextRow();
-    //         UI::TableNextColumn();
-    //         UI::Text("\\$ddd" + Icons::HandORight);
-    //         UI::TableNextColumn();
-
-    //         UI::PushFont(btnFont);
-    //         clickedUnbind = UI::Button("\\$z" + "  UNBIND \n<GIVE UP>");
-    //         // UI::Text("  UNBIND \n<GIVE UP>");
-    //         UI::PopFont();
-
-    //         UI::TableNextColumn();
-    //         UI::Text("\\$ddd" + Icons::HandOLeft);
-    //         // UI::TableNextColumn();
-    //         // UI::TableNextRow();
-    //         // UI::TableNextRow();
-    //         // UI::TableNextColumn();
-    //         // UI::Text("\\$888" + "An author!");
-    //         UI::EndTable();
-    //     }
-
-    //     UI::PopStyleVar();
-
-    //     if (clickedUnbind) {
-    //         OnClickUnbind();
-    //     }
-
-    //     // UI::Columns(3, "UnbindButtonCols", true);
-    //     // UI::Text("\\$ddd" + Icons::HandORight);
-    //     // UI::NextColumn();
-    //     // UI::Text("\\$z" + "UNBIND\nGIVE UP");
-    //     // UI::NextColumn();
-    //     // UI::Text("\\$ddd" + Icons::HandOLeft);
-
-    //     // UI::Columns(1);
-
-    // }
-
-
     void RenderMenu() {
         // todo: take out spaces from titleized
         if (UI::MenuItem(IconifyTitle(PLUGIN_TITLE), "", Setting_Enabled)) {
             Setting_Enabled = !Setting_Enabled;
         }
-    }
-
-
-    void OnClickUnbind() {
-        UI::ShowNotification("You clicked unbind give up", 1500);
-        auto app = GetTmApp();
-        auto mm = cast<CTrackManiaMenus>(app.MenuManager);
-        // mm.DialogInGameMenuAdvanced_OnInputSettings();
-        // mm.DialogQuitRace_OnInputSettings();
-        // app.SystemOverlay.SwitchFullscreen();
-        // app.SystemOverlay.OpenInputSettings();
-        // app.SystemOverlay.OpenInterfaceSettings();
-        // mm.DialogInputSettings();
     }
 
 
