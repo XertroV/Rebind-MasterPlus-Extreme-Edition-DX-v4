@@ -134,7 +134,11 @@ void LoopCheckBinding() {
 }
 
 bool IsGiveUpBound() {
-   string currBindings = string(GameInfo().GetManiaPlanetScriptApi().InputBindings_Bindings[7]);
+   auto mpsapi = GameInfo().GetManiaPlanetScriptApi();
+   if (mpsapi is null || mpsapi.InputBindings_Bindings.Length < 7) {
+      return IsGiveUpBoundAux();
+   }
+   string currBindings = string(mpsapi.InputBindings_Bindings[7]);
    giveUpBindings.RemoveRange(0, giveUpBindings.Length);
    if (currBindings.Length > 0) {
       giveUpBindings.InsertLast(currBindings);
