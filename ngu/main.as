@@ -7,6 +7,7 @@ uint64 lastPrint = 0;
 
 // This seems to be constant, but might not be
 const uint GIVE_UP_ACTION_INDEX = 7;
+const uint RESET_ACTION_INDEX = 8;
 
 const string PLUGIN_TITLE = "Never Give Up!";
 
@@ -136,11 +137,15 @@ bool IsGiveUpBound() {
    string binding;
    giveUpBindings.RemoveRange(0, giveUpBindings.Length);
    // auto curAM = UI::CurrentActionMap();
+   CInputScriptPad@ firstPad;
    for (uint i = 0; i < pads.Length; i++) {
       auto pad = app.InputPort.Script_Pads[i];
       binding = _in.GetActionBinding(pad, "Vehicle", "GiveUp");
       if (binding != "") {
          giveUpBindings.InsertLast(binding);
+         if (firstPad !is null) {
+            @firstPad = pad;
+         }
       }
    }
    binding = array2str(giveUpBindings);
@@ -152,6 +157,38 @@ bool IsGiveUpBound() {
       return false;
    }
    return true;
+}
+
+CInputScriptPad@ firstPadGUBound;
+CInputScriptPad@ GetPadWithGiveUpBound() {
+   auto app = GetTmApp();
+   auto pads = app.InputPort.Script_Pads;
+   auto _in = app.MenuManager.MenuCustom_CurrentManiaApp.Input;
+   string binding;
+   for (uint i = 0; i < pads.Length; i++) {
+      auto pad = app.InputPort.Script_Pads[i];
+      binding = _in.GetActionBinding(pad, "Vehicle", "GiveUp");
+      if (binding != "") {
+         @firstPadGUBound = pad;
+         return pad;
+      }
+   }
+   return null;
+}
+
+CInputScriptPad@ GetFirstPadGiveUpBoundOrDefault() {
+   if (firstPadGUBound !is null) {
+      return firstPadGUBound;
+   }
+   auto app = GetTmApp();
+   auto pads = app.InputPort.Script_Pads;
+   for (uint i = 0; i < pads.Length; i++) {
+      auto pad = app.InputPort.Script_Pads[i];
+      if (pad.Type != CInputScriptPad::EPadType::Mouse) {
+         return pad;
+      }
+   }
+   return null;
 }
 
 

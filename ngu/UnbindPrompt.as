@@ -18,6 +18,8 @@ const float TAU = Math::Asin(-1) * 2;
 
 const vec4 _WHITE = vec4(1,1,1,2);
 
+GameInfo@ gi = GameInfo();
+
 enum LastAction {
     NoAction,
     UiManuallyClosed,
@@ -85,11 +87,26 @@ class UnbindPrompt {
             return;
         }
 
-        bool appropriateMatch = IsRankedOrCOTD();
+        bool show = false;
 
-        bool _irrelevant = !appropriateMatch || !State_CurrentlyVisible;
-        bool _showAnyway = !Setting_HideWhenIrrelevant && State_CurrentlyVisible;
-        bool _inMenu = UI::CurrentActionMap() == "MenuInputsMap" && getServerInfo() is null;
+        bool appropriateMatch = IsRankedOrCOTD();
+        bool inGame = gi.InGame();
+
+        /* to start with, we want to show if we're in an appropriate match + bound */
+        show = show || (appropriateMatch && isGiveUpBound);
+
+        /* show if we are in a game-mode that we should have giveUp bound but it is not. */
+        show = show || (inGame && !appropriateMatch && !isGiveUpBound);
+
+        /* even if irrelevant we show with this setting */
+        show = show || !Setting_HideWhenIrrelevant;
+
+        // bool _irrelevant = !appropriateMatch || !State_CurrentlyVisible;
+        // bool _showAnyway = !Setting_HideWhenIrrelevant && State_CurrentlyVisible;
+
+        bool _inMenu = UI::CurrentActionMap() == "MenuInputsMap" && !gi.PlaygroundNotNull();
+        /* only show in menu if Setting_HideWhenIrrelevant = false; */
+        show = (show && !_inMenu) || (show && _inMenu && !Setting_HideWhenIrrelevant);
 
         if (last_giveUpBound && !isGiveUpBound) {
             session_giveUpUnbound = true;
@@ -106,9 +123,11 @@ class UnbindPrompt {
         //     print(dict2str(vars));
         // }
 
-        if (((!isGiveUpBound && !_inMenu) || _irrelevant) && !_showAnyway) {
-            return;
-        }
+
+        // if (((!isGiveUpBound && !_inMenu) || _irrelevant) && !_showAnyway) {
+        //     return;
+        // }
+        if (!show) return;
 
         auto app = GetTmApp();
 
@@ -150,13 +169,26 @@ class UnbindPrompt {
         UI::SetWindowPos(Setting_Pos);
 
         UI::BeginGroup();
-            if (UI::BeginTable("header", 3, UI::TableFlags::SizingStretchProp)) {
+            if (UI::BeginTable("header", 4, UI::TableFlags::SizingStretchProp)) {
                 UI::TableNextRow();
 
                 UI::TableNextColumn();
                 UI::PushFont(inlineTitleFont);
                 UI::Text(_title);
                 UI::PopFont();
+
+                UI::TableNextColumn();
+                string msg = isGiveUpBound ? "Bind 'Give Up' to 'Reset'" : "Rebind 'Give Up'";
+                if (MDisabledButton(false, msg)) {
+                    if (isGiveUpBound) {
+                        auto pad = GetPadWithGiveUpBound();
+                        gi.BindInput(RESET_ACTION_INDEX, pad);
+                    } else {
+                        auto pad = GetFirstPadGiveUpBoundOrDefault();
+                        gi.BindInput(GIVE_UP_ACTION_INDEX, pad);
+                    }
+                }
+
 
                 UI::TableNextColumn();
                 // auto visibleIcon = Icons::EyeSlash;
