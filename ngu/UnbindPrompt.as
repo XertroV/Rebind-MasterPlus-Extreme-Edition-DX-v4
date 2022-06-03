@@ -176,7 +176,7 @@ class UnbindPrompt {
                 UI::PopFont();
 
                 UI::TableNextColumn();
-                string msg = isGiveUpBound ? "Bind 'Give Up' to 'Reset'" : "Rebind 'Give Up'";
+                string msg = isGiveUpBound ? "Bind 'Give Up' to 'Respawn'" : "Rebind 'Give Up'";
                 if (MDisabledButton(false, msg)) {
                     if (isGiveUpBound) {
                         auto pad = GetPadWithGiveUpBound();
