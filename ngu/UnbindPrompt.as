@@ -55,6 +55,8 @@ class UnbindPrompt {
     // flag for tracking if we unbound giveUp this map/session
     bool session_giveUpUnbound = false;
 
+    bool hasBeenInGame = false;
+
     // todo
     ShowUI ShouldShowUI() {
         // show the UI when: we need to unbind or rebind giveup
@@ -87,11 +89,21 @@ class UnbindPrompt {
             return;
         }
 
+        /* don't activate in first 60s of booting up b/c it'll look
+           like controls are not bound.
+        */
+
         bool show = false;
 
         bool appropriateMatch = IsRankedOrCOTD();
         bool inGame = gi.InGame();
+        hasBeenInGame = hasBeenInGame || inGame;
         bool inMenu = UI::CurrentActionMap() == "MenuInputsMap" && gi.PlaygroundIsNull();
+
+        // don't show up before we've ever joined a game; unless we show the UI most of the time anyway
+        if (!hasBeenInGame && Setting_HideWhenIrrelevant) {
+            return;
+        }
 
         /* to start with, we want to show if we're in an appropriate match + bound */
         show = show || (appropriateMatch && isGiveUpBound);
