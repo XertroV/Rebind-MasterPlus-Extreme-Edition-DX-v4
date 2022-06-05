@@ -230,57 +230,62 @@ class UnbindPrompt {
 #endif
 
                 UI::TableNextColumn();
-                string msg = isGiveUpBound ? "Bind 'Give Up' to 'Respawn'" : "Rebind 'Give Up'";
-                if (MDisabledButton(false, msg)) {
-                    if (isGiveUpBound) {
-                        auto pad = GetPadWithGiveUpBound();
-                        gi.BindInput(RESET_ACTION_INDEX, pad);
-                        // gi.UnbindInput(pad);
-                    } else {
-                        auto pad = GetFirstPadGiveUpBoundOrDefault();
-                        gi.BindInput(GIVE_UP_ACTION_INDEX, pad);
+                if (UI::IsOverlayShown()) {
+                    string msg = isGiveUpBound ? "Bind 'Give Up' to 'Respawn'" : "Rebind 'Give Up'";
+                    if (MDisabledButton(false, msg)) {
+                        if (isGiveUpBound) {
+                            auto pad = GetPadWithGiveUpBound();
+                            gi.BindInput(RESET_ACTION_INDEX, pad);
+                            // gi.UnbindInput(pad);
+                        } else {
+                            auto pad = GetFirstPadGiveUpBoundOrDefault();
+                            gi.BindInput(GIVE_UP_ACTION_INDEX, pad);
+                        }
                     }
-                }
-                if (Setting_ShowBindWarning) {
-                    AddSimpleTooltip(
-                        "\\$f91" + "Warning: do not rebind keys at certain moments.\n" +
-                        "\n" +
-                        "\\$fff" + "Trackmania will break if the rebind dialog is active during certian events.\n" +
-                        "\\$fd4" + "All input breaks and a game restart is required!\n" +
-                        "\\$fff" + "Particularly, this occurs when:\n" +
-                        "- you finish a lap or the lap ends,\n" +
-                        "- changing or loading maps, and\n" +
-                        "- changing or joining servers, and\n" +
-                        "- certain UI sequences activate.\n" +
-                        "\n" +
-                        "With default settings, this reminder prompt will only show up when it's safe to rebind,\n" +
-                        "and disappears 10s before the server changes maps. Don't dilly dally.\n"+
-                        "\n" +
-                        "Rule-of-thumb:\\$2f5 it's safe in the menu, intro scene and when you can control the car.\n"
-                        "\n" +
-                        "\\$fff" + "This warning can be disabled in settings."
-                    );
-                }
+                    if (Setting_ShowBindWarning) {
+                        AddSimpleTooltip(
+                            "\\$f91" + "Warning: do not rebind keys at certain moments.\n" +
+                            "\n" +
+                            "\\$fff" + "Trackmania will break if the rebind dialog is active during certian events.\n" +
+                            "\\$fd4" + "All input breaks and a game restart is required!\n" +
+                            "\\$fff" + "Particularly, this occurs when:\n" +
+                            "- you finish a lap, the lap ends, or warmup ends,\n" +
+                            "- changing or loading maps, and\n" +
+                            "- changing or joining servers, and\n" +
+                            "- certain UI sequences activate.\n" +
+                            "\n" +
+                            "With default settings, this reminder prompt will only show up when it's safe to rebind,\n" +
+                            "and disappears 10s before the server changes maps. Don't dilly dally.\n"+
+                            "\n" +
+                            "Rule-of-thumb:\\$2f5 it's safe in the menu, intro scene and when you can control the car.\n"
+                            "\n" +
+                            "\\$fff" + "This warning can be disabled in settings."
+                        );
+                    }
 
-                UI::TableNextColumn();
-                auto lockToggle = !Setting_PromptLocked ? Icons::Unlock : Icons::Lock;
-                auto lockToggleBtn = UI::Button(lockToggle);
-                if (lockToggleBtn) {
-                    // clicked lock/unlock
-                    Setting_PromptLocked = !Setting_PromptLocked;
-                }
-                // backwards order from icons (icons show state, tooltip shows function)
-                AddSimpleTooltip((!Setting_PromptLocked ? "Lock" : "Unlock") + " this window.");
+                    UI::TableNextColumn();
+                    auto lockToggle = !Setting_PromptLocked ? Icons::Unlock : Icons::Lock;
+                    auto lockToggleBtn = UI::Button(lockToggle);
+                    if (lockToggleBtn) {
+                        // clicked lock/unlock
+                        Setting_PromptLocked = !Setting_PromptLocked;
+                    }
+                    // backwards order from icons (icons show state, tooltip shows function)
+                    AddSimpleTooltip((!Setting_PromptLocked ? "Lock" : "Unlock") + " this window.");
 
-                UI::TableNextColumn();
-                // auto visibleIcon = Icons::EyeSlash;
-                // auto visibleIcon = Icons::Eye;
-                auto visibleIcon = Icons::Times;
-                if (UI::Button(visibleIcon)) {
-                    // clicked hide
-                    State_CurrentlyVisible = false;
+                    UI::TableNextColumn();
+                    // auto visibleIcon = Icons::EyeSlash;
+                    // auto visibleIcon = Icons::Eye;
+                    auto visibleIcon = Icons::Times;
+                    if (UI::Button(visibleIcon)) {
+                        // clicked hide
+                        State_CurrentlyVisible = false;
+                    }
+                    AddSimpleTooltip("Hide until next time you should unbind.");
+                } else {
+                    UI::AlignTextToFramePadding();
+                    UI::Text("\\$f81Show UI/Overlay for buttons.");
                 }
-                AddSimpleTooltip("Hide until next time you should unbind.");
 
                 UI::EndTable();
             }

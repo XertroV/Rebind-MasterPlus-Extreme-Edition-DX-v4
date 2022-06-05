@@ -160,7 +160,9 @@ class GameInfo {
     }
 
     uint GameTimeMsLeft() {
-        if (GetCurrentPlayground() is null || GetManiaAppPlayground() is null) return 0;
+        if (GetCurrentPlayground() is null || GetManiaAppPlayground() is null
+            || GetCurrentPlayground().Arena is null
+            || GetCurrentPlayground().Arena.Rules is null) return 0;
         int end = GetCurrentPlayground().Arena.Rules.RulesStateEndTime;
         int now = GetManiaAppPlayground().Playground.GameTime;
         return end - now;
