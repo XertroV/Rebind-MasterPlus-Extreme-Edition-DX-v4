@@ -41,6 +41,39 @@ vec2 _UnbindTextXY() {
     return _UNBIND_TEXT_XY * Setting_WindowScale;
 }
 
+int prevUiSequence = 0;
+int lastUiSequence = 0;
+int timeInGame = 0;
+int lastNow = 0;
+bool uiDialogSafe = false; // experimental
+// note: can also check game time left to avoid allowing clicking before time is too low
+
+bool startedLoopTrackGameUiSeq = false;
+void LoopTrackGameUiSeq() {
+    if (startedLoopTrackGameUiSeq) return;
+    startedLoopTrackGameUiSeq = true;
+
+    while (true) {
+        if (!gi.InGame()) {
+            lastUiSequence = 0;
+            timeInGame = 0;
+            uiDialogSafe = false;
+        } else {
+            if (lastNow > 0)
+                timeInGame += Time::Now - lastNow;
+            prevUiSequence = lastUiSequence;
+            lastUiSequence = gi.GetPlaygroundFstUISequence();
+            if (lastUiSequence == 1 && prevUiSequence > 1) {
+                // I think the dialog is always safe after this point, mb?
+                uiDialogSafe = true;
+            }
+        }
+
+        lastNow = Time::Now;
+        yield();
+    }
+}
+
 
 class UnbindPrompt {
     string sessionIcon;
@@ -71,6 +104,7 @@ class UnbindPrompt {
 
         // set up state stuff
         OnNewMode();
+        startnew(LoopTrackGameUiSeq);
     }
 
 
@@ -98,7 +132,10 @@ class UnbindPrompt {
         bool appropriateMatch = IsRankedOrCOTD();
         bool inGame = gi.InGame();
         hasBeenInGame = hasBeenInGame || inGame;
-        bool inMenu = UI::CurrentActionMap() == "MenuInputsMap" && gi.PlaygroundIsNull();
+        bool inMenu = gi.InMainMenu();
+        bool isLoading = gi.IsLoadingScreen();
+        bool appropriateUiSeq = uiDialogSafe || (lastUiSequence == 1 && timeInGame > 5000);
+        bool inputsInitialized = InputBindingsInitialized();
 
         // don't show up before we've ever joined a game; unless we show the UI most of the time anyway
         if (!hasBeenInGame && Setting_HideWhenIrrelevant) {
@@ -106,21 +143,24 @@ class UnbindPrompt {
         }
 
         /* to start with, we want to show if we're in an appropriate match + bound */
-        show = show || (appropriateMatch && isGiveUpBound);
+        show = show || (appropriateMatch && isGiveUpBound && appropriateUiSeq);
 
         /* show if we are in a game-mode that we should have giveUp bound but it is not. */
-        show = show || (inGame && !appropriateMatch && !isGiveUpBound);
+        show = show || (inGame && !appropriateMatch && !isGiveUpBound && appropriateUiSeq);
 
         show = show || (inMenu && !isGiveUpBound);
 
-        /* show always if this is false */
-        show = show || !Setting_HideWhenIrrelevant;
+        /* show always if this is false; but not if it's unsafe */
+        show = show || (!Setting_HideWhenIrrelevant && (appropriateUiSeq || inMenu));
 
         if (last_giveUpBound && !isGiveUpBound) {
             session_giveUpUnbound = true;
         }
 
         last_giveUpBound = isGiveUpBound;
+
+        /* never show when inputs aren't initd */
+        show = show && inputsInitialized;
 
         if (!show) return;
 
@@ -162,13 +202,17 @@ class UnbindPrompt {
         UI::SetWindowPos(Setting_Pos);
 
         UI::BeginGroup();
-            if (UI::BeginTable("header", 4, UI::TableFlags::SizingStretchProp)) {
+            if (UI::BeginTable("header", 10, UI::TableFlags::SizingStretchProp)) {
                 UI::TableNextRow();
 
                 UI::TableNextColumn();
                 UI::PushFont(inlineTitleFont);
                 UI::Text(_title);
                 UI::PopFont();
+
+                UI::TableNextColumn();
+                UI::AlignTextToFramePadding();
+                UI::Text('UiSeq:' + lastUiSequence);
 
                 UI::TableNextColumn();
                 string msg = isGiveUpBound ? "Bind 'Give Up' to 'Respawn'" : "Rebind 'Give Up'";

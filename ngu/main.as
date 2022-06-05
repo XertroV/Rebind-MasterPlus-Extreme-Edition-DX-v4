@@ -133,8 +133,15 @@ void LoopCheckBinding() {
    }
 }
 
+bool InputBindingsInitialized() {
+   auto msapi = gi.GetManiaPlanetScriptApi();
+   if (msapi is null) return false;
+   if (msapi.InputBindings_Bindings.Length < 7) return false;
+   return true;
+}
+
 bool IsGiveUpBound() {
-   auto mpsapi = GameInfo().GetManiaPlanetScriptApi();
+   auto mpsapi = gi.GetManiaPlanetScriptApi();
    if (mpsapi is null || mpsapi.InputBindings_Bindings.Length < 7) {
       return IsGiveUpBoundAux();
    }
@@ -144,7 +151,7 @@ bool IsGiveUpBound() {
       giveUpBindings.InsertLast(currBindings);
       return true;
    }
-   return false;
+   return IsGiveUpBoundAux(); // fallback - gets mouse buttons too?
 }
 
 // hmm, this doesn't work in menus -- mb b/c GetActionBinding checks "Vehicle"?
@@ -216,8 +223,6 @@ void OnSettingsChanged() {
 }
 
 void RenderMenu() {
-   auto app = GetTmApp();
-   auto mm = cast<CTrackManiaMenus>(app.MenuManager);
    unbindPrompt.RenderMenu();
 }
 
