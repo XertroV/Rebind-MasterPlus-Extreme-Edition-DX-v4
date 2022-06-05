@@ -58,11 +58,12 @@ void LoopTrackGameUiSeq() {
         lastUiSequence = gi.GetPlaygroundFstUISequence();
         if (lastNow > 0)
             timeInGame += Time::Now - lastNow;
-#if DEV
         if (prevUiSequence != lastUiSequence) {
+#if DEV
             print("UISequence: " + lastUiSequence);
-        }
 #endif
+            // todo: try calling a cleanup function like On_BindingsUnbind() or something -- anything that will restore controls / functionality */
+        }
         if (!gi.InGame() || gi.IsLoadingScreen()) {
             lastUiSequence = timeInGame = lastNow = 0;
             uiDialogSafe = false;
