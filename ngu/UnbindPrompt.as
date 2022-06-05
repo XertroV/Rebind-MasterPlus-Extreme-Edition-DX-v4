@@ -250,12 +250,13 @@ class UnbindPrompt {
                         "\\$fff" + "Particularly, this occurs when:\n" +
                         "- you finish a lap or the lap ends,\n" +
                         "- changing or loading maps, and\n" +
+                        "- changing or joining servers, and\n" +
                         "- certain UI sequences activate.\n" +
                         "\n" +
                         "With default settings, this reminder prompt will only show up when it's safe to rebind,\n" +
                         "and disappears 10s before the server changes maps. Don't dilly dally.\n"+
                         "\n" +
-                        "Rule-of-thumb:\\$2f5 it's safe in the intro scene and when you can control the car.\n"
+                        "Rule-of-thumb:\\$2f5 it's safe in the menu, intro scene and when you can control the car.\n"
                         "\n" +
                         "\\$fff" + "This warning can be disabled in settings."
                     );
