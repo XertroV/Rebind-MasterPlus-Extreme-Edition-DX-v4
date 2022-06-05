@@ -209,18 +209,25 @@ class UnbindPrompt {
         Setting_Pos.x = Math::Max(0, Setting_Pos.x);
         UI::SetWindowPos(Setting_Pos);
 
+        int cols = 4;
+#if DEV
+        cols += 1;
+#endif
         UI::BeginGroup();
-            if (UI::BeginTable("header", 10, UI::TableFlags::SizingStretchProp)) {
+            if (UI::BeginTable("header", cols, UI::TableFlags::SizingStretchProp)) {
+                for (int i = 0; i < cols-2; i++) UI::TableSetupColumn('', UI::TableColumnFlags::WidthStretch);
+                for (int i = 0; i < 2; i++) UI::TableSetupColumn('btns', UI::TableColumnFlags::WidthFixed);
                 UI::TableNextRow();
-
                 UI::TableNextColumn();
                 UI::PushFont(inlineTitleFont);
                 UI::Text(_title);
                 UI::PopFont();
 
+#if DEV
                 UI::TableNextColumn();
                 UI::AlignTextToFramePadding();
                 UI::Text('UiSeq:' + lastUiSequence);
+#endif
 
                 UI::TableNextColumn();
                 string msg = isGiveUpBound ? "Bind 'Give Up' to 'Respawn'" : "Rebind 'Give Up'";
@@ -237,25 +244,22 @@ class UnbindPrompt {
                 if (Setting_ShowBindWarning) {
                     AddSimpleTooltip(
                         "\\$f91" + "Warning: do not rebind keys at certain moments.\n" +
+                        "\n" +
                         "\\$fff" + "Trackmania will break if the rebind dialog is active during certian events.\n" +
-                        "Particularly:\n" +
-                        "- when you finish a lap or the lap ends,\n" +
+                        "\\$fd4" + "All input breaks and a game restart is required!\n" +
+                        "\\$fff" + "Particularly, this occurs when:\n" +
+                        "- you finish a lap or the lap ends,\n" +
                         "- changing or loading maps, and\n" +
-                        "- when certain UI sequences activate.\n" +
+                        "- certain UI sequences activate.\n" +
+                        "\n" +
                         "With default settings, this reminder prompt will only show up when it's safe to rebind,\n" +
-                        "and disappears 10s before the server changes maps. Don't dilly dally."
+                        "and disappears 10s before the server changes maps. Don't dilly dally.\n"+
+                        "\n" +
+                        "Rule-of-thumb:\\$2f5 it's safe in the intro scene and when you can control the car.\n"
+                        "\n" +
+                        "\\$fff" + "This warning can be disabled in settings."
                     );
                 }
-
-
-                UI::TableNextColumn();
-                // auto visibleIcon = Icons::EyeSlash;
-                auto visibleIcon = Icons::Eye;
-                if (UI::Button(visibleIcon)) {
-                    // clicked hide
-                    State_CurrentlyVisible = false;
-                }
-                AddSimpleTooltip("Hide until next time you should unbind.");
 
                 UI::TableNextColumn();
                 auto lockToggle = !Setting_PromptLocked ? Icons::Unlock : Icons::Lock;
@@ -266,6 +270,16 @@ class UnbindPrompt {
                 }
                 // backwards order from icons (icons show state, tooltip shows function)
                 AddSimpleTooltip((!Setting_PromptLocked ? "Lock" : "Unlock") + " this window.");
+
+                UI::TableNextColumn();
+                // auto visibleIcon = Icons::EyeSlash;
+                // auto visibleIcon = Icons::Eye;
+                auto visibleIcon = Icons::Times;
+                if (UI::Button(visibleIcon)) {
+                    // clicked hide
+                    State_CurrentlyVisible = false;
+                }
+                AddSimpleTooltip("Hide until next time you should unbind.");
 
                 UI::EndTable();
             }
