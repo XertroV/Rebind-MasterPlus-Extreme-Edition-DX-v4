@@ -34,8 +34,8 @@ class GameInfo {
         return GetNetwork().PlaygroundClientScriptAPI;
     }
 
-    CGamePlayground@ GetCurrentPlayground() {
-        return app.CurrentPlayground;
+    CSmArenaClient@ GetCurrentPlayground() {
+        return cast<CSmArenaClient>(app.CurrentPlayground);
     }
 
     MwFastBuffer<CGamePlaygroundUIConfig@> GetPlaygroundUIConfigs() {
@@ -157,6 +157,13 @@ class GameInfo {
 
     bool InGame() {
         return PlaygroundNotNull() && (string(GetServerInfo().CurGameModeStr).Length > 0);
+    }
+
+    uint GameTimeMsLeft() {
+        if (GetCurrentPlayground() is null || GetManiaAppPlayground() is null) return 0;
+        int end = GetCurrentPlayground().Arena.Rules.RulesStateEndTime;
+        int now = GetManiaAppPlayground().Playground.GameTime;
+        return end - now;
     }
 
     /* context */

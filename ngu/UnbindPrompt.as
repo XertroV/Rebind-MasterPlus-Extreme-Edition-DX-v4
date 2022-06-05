@@ -54,18 +54,24 @@ void LoopTrackGameUiSeq() {
     startedLoopTrackGameUiSeq = true;
 
     while (true) {
-        if (!gi.InGame()) {
-            lastUiSequence = 0;
-            timeInGame = 0;
+        prevUiSequence = lastUiSequence;
+        lastUiSequence = gi.GetPlaygroundFstUISequence();
+        if (lastNow > 0)
+            timeInGame += Time::Now - lastNow;
+#if DEV
+        if (prevUiSequence != lastUiSequence) {
+            print("UISequence: " + lastUiSequence);
+        }
+#endif
+        if (!gi.InGame() || gi.IsLoadingScreen()) {
+            lastUiSequence = timeInGame = lastNow = 0;
             uiDialogSafe = false;
         } else {
-            if (lastNow > 0)
-                timeInGame += Time::Now - lastNow;
-            prevUiSequence = lastUiSequence;
-            lastUiSequence = gi.GetPlaygroundFstUISequence();
-            if (lastUiSequence == 1 && prevUiSequence > 1) {
+            if ((lastUiSequence == 1 || lastUiSequence == 2) && prevUiSequence > 1) {
                 // I think the dialog is always safe after this point, mb?
                 uiDialogSafe = true;
+            } else if (lastUiSequence > 2) {
+                uiDialogSafe = false;
             }
         }
 
@@ -134,7 +140,9 @@ class UnbindPrompt {
         hasBeenInGame = hasBeenInGame || inGame;
         bool inMenu = gi.InMainMenu();
         bool isLoading = gi.IsLoadingScreen();
-        bool appropriateUiSeq = uiDialogSafe || (lastUiSequence == 1 && timeInGame > 5000);
+        bool enoughTimeLeft = gi.GameTimeMsLeft() > 10000;
+        bool appropriateUiSeq = uiDialogSafe || (lastUiSequence == 1 && timeInGame > 8000);
+        appropriateUiSeq = appropriateUiSeq && enoughTimeLeft;
         bool inputsInitialized = InputBindingsInitialized();
 
         // don't show up before we've ever joined a game; unless we show the UI most of the time anyway
@@ -225,6 +233,18 @@ class UnbindPrompt {
                         auto pad = GetFirstPadGiveUpBoundOrDefault();
                         gi.BindInput(GIVE_UP_ACTION_INDEX, pad);
                     }
+                }
+                if (Setting_ShowBindWarning) {
+                    AddSimpleTooltip(
+                        "\\$f91" + "Warning: do not rebind keys at certain moments.\n" +
+                        "\\$fff" + "Trackmania will break if the rebind dialog is active during certian events.\n" +
+                        "Particularly:\n" +
+                        "- when you finish a lap or the lap ends,\n" +
+                        "- changing or loading maps, and\n" +
+                        "- when certain UI sequences activate.\n" +
+                        "With default settings, this reminder prompt will only show up when it's safe to rebind,\n" +
+                        "and disappears 10s before the server changes maps. Don't dilly dally."
+                    );
                 }
 
 
