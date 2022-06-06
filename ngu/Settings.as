@@ -58,5 +58,5 @@ vec2 Setting_Pos = vec2(200, 66);
 [Setting category="General" name="Lock Window?"]
 bool Setting_PromptLocked = false;
 
-[Setting category="General" name="Show warning under bind/rebind button?" description="It's dangerous to rebind sometimes, so it's good to be warned."]
-bool Setting_ShowBindWarning = true;
+// [Setting category="General" name="Show warning under bind/rebind button?" description="It's dangerous to rebind sometimes, so it's good to be warned."]
+// bool Setting_ShowBindWarning = true;

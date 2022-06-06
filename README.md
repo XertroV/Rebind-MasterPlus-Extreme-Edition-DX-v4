@@ -7,8 +7,6 @@ To experiment with the plugin, uncheck the "Hide UI in menus and for other game 
 
 To use the buttons, the OpenPlanet overlay must be shown/visible -- otherwise buttons don't work.
 
-*Warning: there's a notable bug in Trackmania that matters for this plugin. You can safely rebind only at certain times. There is a warning shown when you hover over the bind/rebind button which explains this.*
-
 You can easily hide the prompt with one-click if you want it to go away for that session. (It will show up again the next time you're in an appropriate game mode.)
 
 You can optionally set additional game modes.
