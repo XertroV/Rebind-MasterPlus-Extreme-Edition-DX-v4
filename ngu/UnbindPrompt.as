@@ -62,7 +62,14 @@ void LoopTrackGameUiSeq() {
 #if DEV
             print("UISequence: " + lastUiSequence);
 #endif
-            // todo: try calling a cleanup function like On_BindingsUnbind() or something -- anything that will restore controls / functionality */
+            // if (!gi.GetManiaPlanetScriptApi().Dialog_IsFinished) {
+            if (gi.app.Operation_InProgress) {
+                warn("Running Operation_Abort");
+                gi.app.Operation_Abort();
+                /* this doesn't work more than once, but going from 1->4 and calling this immediately seems to allow more time to cancel dialog.
+                   gi.UnbindInputDevice(GetPadWithGiveUpBound()); // GetPadWithGiveUpBound() // null
+                */
+            }
         }
         if (!gi.InGame() || gi.IsLoadingScreen()) {
             lastUiSequence = timeInGame = lastNow = 0;
@@ -71,7 +78,7 @@ void LoopTrackGameUiSeq() {
             if ((lastUiSequence == 1 || lastUiSequence == 2) && prevUiSequence > 1) {
                 // I think the dialog is always safe after this point, mb?
                 uiDialogSafe = true;
-            } else if (lastUiSequence > 2) {
+            } else if (lastUiSequence > 2 || lastUiSequence == 0) {
                 uiDialogSafe = false;
             }
         }

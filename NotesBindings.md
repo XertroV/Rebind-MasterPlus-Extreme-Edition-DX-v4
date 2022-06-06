@@ -35,3 +35,10 @@ EContext::Unknown
 
 
 # idea: intercept `MwFastBuffer<CInputScriptPad::EButton> ButtonEvents` in `CInputPadScript`?
+
+# callbacks that might reset input problems:
+
+DialogInputSettings_OnBindingsUnbindKey
+DialogInGameMenuAdvanced_OnInputSettings
+
+(note: these don't work)

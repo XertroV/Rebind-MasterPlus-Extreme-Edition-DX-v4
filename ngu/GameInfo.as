@@ -122,6 +122,11 @@ class GameInfo {
         auto mpsapi = GetManiaPlanetScriptApi();
         mpsapi.Dialog_BindInput(ActionIndex, Device);
     }
+
+    void UnbindInputDevice(CInputScriptPad@ Device) {
+        GetManiaPlanetScriptApi().Dialog_UnbindInputDevice(Device);
+    }
+
     /* dialog bug notes
         MPScriptApi.Dialog_IsFinished = true/false
                    .ActiveContext_ClassicDialogDisplayed
