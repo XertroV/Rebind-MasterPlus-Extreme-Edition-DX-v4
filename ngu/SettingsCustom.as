@@ -77,12 +77,17 @@ void RenderSettingsCustomModesTab() {
 
 bool State_CurrentlyVisible = true;
 bool State_UserDidUnbindWhenPrompted = false;
+bool State_hasBeenInGame = false;
 
 [SettingsTab name="Plugin State"]
 void RenderSettingsPluginState() {
     State_CurrentlyVisible = UI::Checkbox("Currently visible?", State_CurrentlyVisible);
     AddSimpleTooltip("If this is false, then the prompt will be temporarily hidden for the rest of this map.");
 
-    State_UserDidUnbindWhenPrompted = UI::Checkbox("User did unbind when prompted", State_UserDidUnbindWhenPrompted);
-    AddSimpleTooltip("This flag is true if the user unbound giveup when prompted to.\nThis is used to figure out if the rebind prompt should be shown.");
+    // State_UserDidUnbindWhenPrompted = UI::Checkbox("User did unbind when prompted", State_UserDidUnbindWhenPrompted);
+    // AddSimpleTooltip("This flag is true if the user unbound giveup when prompted to.\nThis is used to figure out if the rebind prompt should be shown.");
+
+    State_hasBeenInGame = UI::Checkbox("Has been in game?", State_hasBeenInGame);
+    AddSimpleTooltip("Set to false on initial game load.");
+
 }

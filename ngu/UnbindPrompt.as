@@ -59,9 +59,7 @@ void LoopTrackGameUiSeq() {
         if (lastNow > 0)
             timeInGame += Time::Now - lastNow;
         if (prevUiSequence != lastUiSequence) {
-#if DEV
-            print("UISequence: " + lastUiSequence);
-#endif
+            trace("UISequence: " + lastUiSequence + " (previously: " + prevUiSequence + ")");
             // if (!gi.GetManiaPlanetScriptApi().Dialog_IsFinished) {
             if (gi.app.Operation_InProgress) {
                 warn("Running Operation_Abort");
@@ -72,7 +70,7 @@ void LoopTrackGameUiSeq() {
             }
         }
         if (!gi.InGame() || gi.IsLoadingScreen()) {
-            lastUiSequence = timeInGame = lastNow = 0;
+            timeInGame = lastNow = 0;
             uiDialogSafe = false;
         } else {
             if ((lastUiSequence == 1 || lastUiSequence == 2) && prevUiSequence > 1) {
@@ -102,7 +100,6 @@ class UnbindPrompt {
     // flag for tracking if we unbound giveUp this map/session
     bool session_giveUpUnbound = false;
 
-    bool hasBeenInGame = false;
 
     // todo
     ShowUI ShouldShowUI() {
@@ -111,6 +108,7 @@ class UnbindPrompt {
     }
 
     UnbindPrompt() {
+        State_hasBeenInGame = false;
         // set the icon for this session.
         sessionIcon = GetIcon(Time::get_Now());
         @btnFont = Resources::GetFont("DroidSans-Bold.ttf", _UNBIND_TITLE_FONT_SIZE * Setting_WindowScale);
@@ -145,16 +143,16 @@ class UnbindPrompt {
 
         bool appropriateMatch = IsRankedOrCOTD();
         bool inGame = gi.InGame();
-        hasBeenInGame = hasBeenInGame || inGame;
+        State_hasBeenInGame = State_hasBeenInGame || inGame;
         bool inMenu = gi.InMainMenu();
         bool isLoading = gi.IsLoadingScreen();
-        bool enoughTimeLeft = gi.GameTimeMsLeft() > 10000;
-        bool appropriateUiSeq = uiDialogSafe || (lastUiSequence == 1 && timeInGame > 8000);
+        bool enoughTimeLeft = gi.GameTimeMsLeft() > 4000;
+        bool appropriateUiSeq = uiDialogSafe || (lastUiSequence == 1 && timeInGame > 10000);
         appropriateUiSeq = appropriateUiSeq && enoughTimeLeft;
         bool inputsInitialized = InputBindingsInitialized();
 
         // don't show up before we've ever joined a game; unless we show the UI most of the time anyway
-        if (!hasBeenInGame && Setting_HideWhenIrrelevant) {
+        if (!State_hasBeenInGame && Setting_HideWhenIrrelevant) {
             return;
         }
 
@@ -240,7 +238,7 @@ class UnbindPrompt {
                 UI::TableNextColumn();
                 if (UI::IsOverlayShown()) {
                     string msg = isGiveUpBound ? "Bind 'Give Up' to 'Respawn'" : "Rebind 'Give Up'";
-                    if (MDisabledButton(false, msg)) {
+                    if (MDisabledButton(gi.app.Operation_InProgress, msg)) {
                         if (isGiveUpBound) {
                             auto pad = GetPadWithGiveUpBound();
                             gi.BindInput(RESET_ACTION_INDEX, pad);
