@@ -18,6 +18,8 @@ You can optionally set additional game modes.
 
 ### Dialog Bug Details
 
+**FIXED:** *v0.2.4 Adds a workaround for this issue to abort the dialog and prevent the bug from happening! Yay!*
+
 If you have the bind/unbind dialog open, and the game does certain things (like joining maps, or certain in-game events), then the game becomes unplayable. The dialog goes away, but nearly all inputs are dropped after this point.
 
 I guess that the 'bind input' dialog needs to redirect inputs to itself, but when they game removes the dialog it does not clean up the input redirection.
