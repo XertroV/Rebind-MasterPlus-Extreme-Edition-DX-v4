@@ -25,76 +25,6 @@ bool isGiveUpBound;
 string[] giveUpBindings;
 string prevBindings = "";
 
-// debug function for printing members of a MwClassInfo recursively
-void _printMembers(const Reflection::MwClassInfo@ ty) {
-   auto members = ty.Members;
-   string extra;
-   for (uint i = 0; i < members.Length; i++) {
-      // extra = " (" + members[i].Members.Length + " children)";
-      print("  " + members[i].Name + extra);
-   }
-   if (ty.BaseType !is null) {
-      _printMembers(ty.BaseType);
-   }
-}
-
-
-// debug function for sorta pretty-printing the members of anything that inherits from CMwNod
-void printMembers(CMwNod@ nod) {
-   if (nod is null) {
-      warn(">>> Object of type: null <<<");
-      return;
-   }
-   auto ty = Reflection::TypeOf(nod);
-   auto name = ty.Name;
-   print("\n>>> Object of type: " + name + " <<<");
-   print("Members:");
-   _printMembers(ty);
-   print("");
-}
-
-
-void printNameAndType(string varName, CMwNod@ nod) {
-   auto ty = Reflection::TypeOf(nod);
-   print("VAR/TYPE: " + varName + " :: " + (ty is null ? "null" : ty.Name));
-}
-
-
-
-
-bool dGetBool(dictionary@d, string k) {
-   bool ret;
-   d.Get(k, ret);
-   return ret;
-}
-
-
-const string _dictIndent = "  ";
-string dict2str(dictionary@ dict) {
-   auto ks = dict.GetKeys();
-   string[] lines;
-   for (uint i = 0; i < ks.Length; i++) {
-      lines.InsertLast(_dictIndent + "{ '" + ks[i] + "', " + dGetBool(dict, ks[i]) + " }");
-   }
-   if (lines.Length == 0) {
-      return "{ }";
-   }
-   auto body = string::Join(lines, "\n");
-   return "{\n" + body + "\n}";
-}
-
-
-string array2str(string[] arr) {
-   string[] lines;
-   for (uint i = 0; i < arr.Length; i++) {
-      lines.InsertLast("'" + arr[i] + "'");
-   }
-   if (lines.Length == 0) {
-      return "[ ]";
-   }
-   return "[" + string::Join(lines, ", ") + "]";
-}
-
 
 
 CTrackMania@ GetTmApp() {
@@ -156,19 +86,29 @@ uint GetActionIndex(const string &in actionName) {
 }
 
 bool IsGiveUpBound() {
-   return IsGiveUpBoundAux();
+   // seems like this is somewhat problematic, so just use the other way that should be more robust.
+   // return IsGiveUpBoundAux();
+   auto app = GetTmApp();
    auto mpsa = gi.GetManiaPlanetScriptApi();
-   if (mpsa is null || mpsa.InputBindings_Bindings.Length < 7) {
+   if (!InputBindingsInitialized()) {
       return IsGiveUpBoundAux();
    }
-   uint giveUpIx = GetActionIndex(GIVE_UP_ACTION_NAME);
-   string currBindings = string(mpsa.InputBindings_Bindings[giveUpIx]);
+   auto pads = app.InputPort.Script_Pads;
    giveUpBindings.RemoveRange(0, giveUpBindings.Length);
-   if (currBindings.Length > 0) {
-      giveUpBindings.InsertLast(currBindings);
+   for (uint i = 0; i < pads.Length; i++) {
+      auto pad = pads[i];
+      if (!CheckPadOkaySettings(pad)) continue;
+      mpsa.InputBindings_UpdateList(CGameManiaPlanetScriptAPI::EInputsListFilter::OnlyPlayer, pad);
+      uint giveUpIx = GetActionIndex(GIVE_UP_ACTION_NAME);
+      string currBindings = string(mpsa.InputBindings_Bindings[giveUpIx]);
+      if (currBindings.Length > 0) {
+         giveUpBindings.InsertLast(currBindings);
+      }
+   }
+   if (giveUpBindings.Length > 0) {
       return true;
    }
-   return IsGiveUpBoundAux(); // fallback - gets mouse buttons too?
+   return IsGiveUpBoundAux(); // fallback
 }
 
 // hmm, this doesn't work in menus -- mb b/c GetActionBinding checks "Vehicle"?
@@ -203,14 +143,6 @@ bool IsGiveUpBoundAux() {
 }
 
 
-enum PadType {
-    Keyboard = 0,
-    Mouse = 1,
-    GamePad = 2,
-    AnyInputButMouse = 6,
-    AnyInputDevice = 7,
-}
-
 bool CheckPadOkaySettings(CInputScriptPad@ pad) {
    // CInputScriptPad::EPadType
    if (Setting_PadType == PadType::Keyboard)
@@ -223,8 +155,8 @@ bool CheckPadOkaySettings(CInputScriptPad@ pad) {
          || pad.Type == CInputScriptPad::EPadType::PlayStation
          || pad.Type == CInputScriptPad::EPadType::Vive
          ;
-   if (Setting_PadType == PadType::AnyInputButMouse)
-      return pad.Type != CInputScriptPad::EPadType::Mouse;
+   // if (Setting_PadType == PadType::AnyInputButMouse)
+   //    return pad.Type != CInputScriptPad::EPadType::Mouse;
    // if Setting_PadType == AnyInputDevice then we'll return true anyway.
    return true;
 }
@@ -307,6 +239,7 @@ void Render() {
    if (Setting_RenderIfUiHidden) {
       _Render();
    }
+   Wizard::Render();
 }
 
 

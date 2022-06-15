@@ -157,7 +157,7 @@ class UnbindPrompt {
         bool inputsInitialized = InputBindingsInitialized();
 
         // don't show up before we've ever joined a game; unless we show the UI most of the time anyway
-        if (!State_hasBeenInGame && Setting_HideWhenIrrelevant) {
+        if (!State_hasBeenInGame && Setting_HideWhenIrrelevant && !State_WizardShouldRun) {
             return;
         }
 
@@ -169,8 +169,12 @@ class UnbindPrompt {
 
         show = show || (inMenu && !isGiveUpBound);
 
+        // if HWI is false and WizardShouldRun is true, then hideWhenIrrelevant is false.
+        bool hideWhenIrrelevant = !(!Setting_HideWhenIrrelevant || State_WizardShouldRun);
+        bool isPreview = State_WizardShouldRun;
+
         /* show always if this is false; but not if it's unsafe */
-        show = show || (!Setting_HideWhenIrrelevant && (appropriateUiSeq || inMenu));
+        show = show || (!hideWhenIrrelevant && (appropriateUiSeq || inMenu));
 
         if (last_giveUpBound && !isGiveUpBound) {
             session_giveUpUnbound = true;
@@ -207,6 +211,7 @@ class UnbindPrompt {
         // UI::SetNextWindowSize(int(_dims.x), int(_dims.y), UI::Cond::FirstUseEver);
         // UI::SetNextWindowSize(800, 300);
         string _title = IconifyTitle(PLUGIN_TITLE, true);
+        if (isPreview) _title += " (Preview)";
 
         // window styles
         UI::PushStyleVar(UI::StyleVar::WindowRounding, 0.);
@@ -250,6 +255,8 @@ class UnbindPrompt {
                             // gi.UnbindInput(pad);
                         } else {
                             auto pad = GetFirstPadGiveUpBoundOrDefault();
+                            // if (Setting_PadType == PadType::AnyInputButMouse)
+                            //     @pad = null;
                             gi.BindInput(GetActionIndex(GIVE_UP_ACTION_NAME), pad);
                         }
                     }

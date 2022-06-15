@@ -79,6 +79,9 @@ bool State_CurrentlyVisible = true;
 bool State_UserDidUnbindWhenPrompted = false;
 bool State_hasBeenInGame = false;
 
+[Setting hidden]
+bool State_WizardShouldRun = true;
+
 [SettingsTab name="Plugin State"]
 void RenderSettingsPluginState() {
     State_CurrentlyVisible = UI::Checkbox("Currently visible?", State_CurrentlyVisible);
@@ -90,4 +93,6 @@ void RenderSettingsPluginState() {
     State_hasBeenInGame = UI::Checkbox("Has been in game?", State_hasBeenInGame);
     AddSimpleTooltip("Set to false on initial game load.");
 
+    State_WizardShouldRun = UI::Checkbox("Wizard should run?", State_WizardShouldRun);
+    AddSimpleTooltip("True initially and then false forever more.");
 }

@@ -2,7 +2,7 @@
 name        = "Never Give Up"
 author      = "XertroV"
 category    = "Race"
-version     = "0.2.5"
+version     = "0.2.6"
 
 [script]
 # defines     = [ "DEV" ]
