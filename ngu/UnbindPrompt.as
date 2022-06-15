@@ -8,7 +8,7 @@ const vec2 _UNBIND_WINDOW_DIMS = vec2(_width, _window_height);
 const vec2 _UNBIND_TEXT_XY = vec2(_width, _width * .3);
 
 #if DEV
-const uint REQ_TIME_IN_GAME = 1000;
+const uint REQ_TIME_IN_GAME = 7000;
 #else
 const uint REQ_TIME_IN_GAME = 10000;
 #endif
