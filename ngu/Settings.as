@@ -35,6 +35,10 @@ bool Setting_BlockDelRanked = true;
 [Setting category="General" name="Show reminder when 'Give up' is bound in Knockout (TM_Knockout_Online)"]
 bool Setting_BlockDelKO = true;
 
+[Setting category="General" name="Keyboard or GamePad (or Mouse)?"]
+PadType Setting_PadType = PadType::Keyboard;
+// CInputScriptPad::EPadType Setting_PadType = CInputScriptPad::EPadType::Keyboard;
+
 /*
 
 88   88 88     Yb        dP 88 88b 88 8888b.   dP"Yb  Yb        dP

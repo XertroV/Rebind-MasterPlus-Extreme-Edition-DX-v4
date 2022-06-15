@@ -6,8 +6,12 @@ const bool DEV_MODE = true;
 uint64 lastPrint = 0;
 
 // This seems to be constant, but might not be
-const uint GIVE_UP_ACTION_INDEX = 7;
-const uint RESET_ACTION_INDEX = 8;
+// ! it's not for controllers
+// const uint GIVE_UP_ACTION_INDEX = 7;
+// const uint RESET_ACTION_INDEX = 8;
+const string GIVE_UP_ACTION_NAME = "Give up";
+const string RESPAWN_ACTION_NAME = "Respawn";
+/* player inputs count = 15 for KB and 19 for GamePad */
 
 const string PLUGIN_TITLE = "Never Give Up!";
 
@@ -134,18 +138,31 @@ void LoopCheckBinding() {
 }
 
 bool InputBindingsInitialized() {
-   auto msapi = gi.GetManiaPlanetScriptApi();
-   if (msapi is null) return false;
-   if (msapi.InputBindings_Bindings.Length < 7) return false;
+   auto mpsa = gi.GetManiaPlanetScriptApi();
+   if (mpsa is null) return false;
+   if (mpsa.InputBindings_Bindings.Length < 7) return false;
    return true;
 }
 
+uint GetActionIndex(const string &in actionName) {
+   auto mpsa = gi.GetManiaPlanetScriptApi();
+   for (uint i = 0; i < mpsa.InputBindings_ActionNames.Length; i++) {
+      // debugPrint("mpsa.InputBindings_ActionNames[i]: " + mpsa.InputBindings_ActionNames[i]);
+      if (string(mpsa.InputBindings_ActionNames[i]) == actionName)
+         return i;
+   }
+   throw("Could not find action index for action name: " + actionName);
+   return 0xffffff;
+}
+
 bool IsGiveUpBound() {
-   auto mpsapi = gi.GetManiaPlanetScriptApi();
-   if (mpsapi is null || mpsapi.InputBindings_Bindings.Length < 7) {
+   return IsGiveUpBoundAux();
+   auto mpsa = gi.GetManiaPlanetScriptApi();
+   if (mpsa is null || mpsa.InputBindings_Bindings.Length < 7) {
       return IsGiveUpBoundAux();
    }
-   string currBindings = string(mpsapi.InputBindings_Bindings[7]);
+   uint giveUpIx = GetActionIndex(GIVE_UP_ACTION_NAME);
+   string currBindings = string(mpsa.InputBindings_Bindings[giveUpIx]);
    giveUpBindings.RemoveRange(0, giveUpBindings.Length);
    if (currBindings.Length > 0) {
       giveUpBindings.InsertLast(currBindings);
@@ -165,6 +182,7 @@ bool IsGiveUpBoundAux() {
    CInputScriptPad@ firstPad;
    for (uint i = 0; i < pads.Length; i++) {
       auto pad = app.InputPort.Script_Pads[i];
+      if (!CheckPadOkaySettings(pad)) continue;
       binding = _in.GetActionBinding(pad, "Vehicle", "GiveUp");
       if (binding != "") {
          giveUpBindings.InsertLast(binding);
@@ -184,8 +202,37 @@ bool IsGiveUpBoundAux() {
    return true;
 }
 
-CInputScriptPad@ firstPadGUBound;
+
+enum PadType {
+    Keyboard = 0,
+    Mouse = 1,
+    GamePad = 2,
+    AnyInputButMouse = 6,
+    AnyInputDevice = 7,
+}
+
+bool CheckPadOkaySettings(CInputScriptPad@ pad) {
+   // CInputScriptPad::EPadType
+   if (Setting_PadType == PadType::Keyboard)
+      return pad.Type == CInputScriptPad::EPadType::Keyboard;
+   if (Setting_PadType == PadType::Mouse)
+      return pad.Type == CInputScriptPad::EPadType::Mouse;
+   if (Setting_PadType == PadType::GamePad)
+      return pad.Type == CInputScriptPad::EPadType::Generic
+         || pad.Type == CInputScriptPad::EPadType::XBox
+         || pad.Type == CInputScriptPad::EPadType::PlayStation
+         || pad.Type == CInputScriptPad::EPadType::Vive
+         ;
+   if (Setting_PadType == PadType::AnyInputButMouse)
+      return pad.Type != CInputScriptPad::EPadType::Mouse;
+   // if Setting_PadType == AnyInputDevice then we'll return true anyway.
+   return true;
+}
+
+// CInputScriptPad@ firstPadGUBound;
+int firstPadGUBoundIx = -1;
 CInputScriptPad@ GetPadWithGiveUpBound() {
+      // todo check setting for controller
    auto app = GetTmApp();
    auto pads = app.InputPort.Script_Pads;
    auto _in = app.MenuManager.MenuCustom_CurrentManiaApp.Input;
@@ -193,33 +240,52 @@ CInputScriptPad@ GetPadWithGiveUpBound() {
    for (uint i = 0; i < pads.Length; i++) {
       auto pad = app.InputPort.Script_Pads[i];
       binding = _in.GetActionBinding(pad, "Vehicle", "GiveUp");
-      if (binding != "") {
-         @firstPadGUBound = pad;
+      if (binding != "" && CheckPadOkaySettings(pad)) {
+         // @firstPadGUBound = pad;
+         firstPadGUBoundIx = int(i);
          return pad;
       }
    }
+   firstPadGUBoundIx = -1;
    return null;
 }
 
 CInputScriptPad@ GetFirstPadGiveUpBoundOrDefault() {
-   if (firstPadGUBound !is null) {
-      return firstPadGUBound;
-   }
+   // if (firstPadGUBound !is null) {
+   //    return firstPadGUBound;
+   // }
    auto app = GetTmApp();
    auto pads = app.InputPort.Script_Pads;
+   if (firstPadGUBoundIx > 0 && firstPadGUBoundIx < int(pads.Length)) {
+      auto pad = pads[firstPadGUBoundIx];
+      if (CheckPadOkaySettings(pad))
+         return pad;
+   } else if (firstPadGUBoundIx > 0) {
+      // we used to have a pad but don't anymore, so use the other function and re-cache.
+      return GetPadWithGiveUpBound();
+   }
+   CInputScriptPad@ mouse;
    for (uint i = 0; i < pads.Length; i++) {
+      // todo check setting for controller
       auto pad = app.InputPort.Script_Pads[i];
-      if (pad.Type != CInputScriptPad::EPadType::Mouse) {
+      // don't return the mouse first -- skip and return at end if no other pads
+      if (pad.Type == CInputScriptPad::EPadType::Mouse) {
+         @mouse = pad;
+      } else if (CheckPadOkaySettings(pad)) {
          return pad;
       }
    }
-   return null;
+   return mouse;
 }
 
 
 
 void OnSettingsChanged() {
    unbindPrompt.OnSettingsChanged();
+   auto mpsa = gi.GetManiaPlanetScriptApi();
+   if (mpsa !is null) {
+      mpsa.InputBindings_UpdateList(CGameManiaPlanetScriptAPI::EInputsListFilter::All, GetFirstPadGiveUpBoundOrDefault());
+   }
 }
 
 void RenderMenu() {
@@ -378,4 +444,8 @@ void DebugPrintBindings() {
    for (uint i = 0; i < bs.Length; i++) {
       print("  \\$39f" + string(as[i]) + ": " + string(bs[i]));
    }
+}
+
+void debugPrint(const string &in msg) {
+   print("\\$29f" + msg);
 }

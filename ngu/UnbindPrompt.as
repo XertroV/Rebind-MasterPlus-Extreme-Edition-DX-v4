@@ -7,6 +7,11 @@ const vec2 _UNBIND_WINDOW_DIMS = vec2(_width, _window_height);
 // const vec2 _UNBIND_WINDOW_DIMS = vec2(150, 75);
 const vec2 _UNBIND_TEXT_XY = vec2(_width, _width * .3);
 
+#if DEV
+const uint REQ_TIME_IN_GAME = 1000;
+#else
+const uint REQ_TIME_IN_GAME = 10000;
+#endif
 
 const float _UNBIND_TEXT_FONT_SIZE = 24.;
 const float _UNBIND_TITLE_FONT_SIZE = 20.;
@@ -147,7 +152,7 @@ class UnbindPrompt {
         bool inMenu = gi.InMainMenu();
         bool isLoading = gi.IsLoadingScreen();
         bool enoughTimeLeft = gi.GameTimeMsLeft() > 4000;
-        bool appropriateUiSeq = uiDialogSafe || (lastUiSequence == 1 && timeInGame > 10000);
+        bool appropriateUiSeq = uiDialogSafe || (lastUiSequence == 1 && timeInGame > REQ_TIME_IN_GAME);
         appropriateUiSeq = appropriateUiSeq && enoughTimeLeft;
         bool inputsInitialized = InputBindingsInitialized();
 
@@ -241,11 +246,11 @@ class UnbindPrompt {
                     if (MDisabledButton(gi.app.Operation_InProgress, msg)) {
                         if (isGiveUpBound) {
                             auto pad = GetPadWithGiveUpBound();
-                            gi.BindInput(RESET_ACTION_INDEX, pad);
+                            gi.BindInput(GetActionIndex(RESPAWN_ACTION_NAME), pad);
                             // gi.UnbindInput(pad);
                         } else {
                             auto pad = GetFirstPadGiveUpBoundOrDefault();
-                            gi.BindInput(GIVE_UP_ACTION_INDEX, pad);
+                            gi.BindInput(GetActionIndex(GIVE_UP_ACTION_NAME), pad);
                         }
                     }
                     // if (Setting_ShowBindWarning) {
