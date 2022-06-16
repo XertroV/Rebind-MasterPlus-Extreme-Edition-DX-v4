@@ -44,9 +44,12 @@ namespace Menu {
         if (!Setting_Enabled) return;
         // UI::PushFont(normalFont);
         UI::PushStyleColor(UI::Col::TextDisabled, L_GRAY_VEC);
-
-        if (UI::BeginMenu(mainColor(CurrIcon) + " Bindings", _enabled)) {
-
+        bool menuOpen = UI::BeginMenu(mainColor(CurrIcon) + " Bindings", _enabled);
+        if (UI::IsItemHovered()) {
+            // true if the disabled menubar menuitem is hovered.
+            AddSimpleTooltip("\\$f62" + "Sorry, it's unsafe to bind keys right now.");
+        }
+        if (menuOpen) {
             int tfs = 0
                 // | UI::TableFlags::SizingStretchSame
                 // | UI::TableFlags::SizingFixedFit
@@ -76,7 +79,9 @@ namespace Menu {
 
             UI::EndMenu();
         } else {
-            CurrIcon = GetIcon(GetCurrPad());
+            string newi = GetIcon(GetCurrPad());
+            if (newi != CurrIcon)
+                CurrIcon = newi;
         }
 
         UI::PopStyleColor(1);

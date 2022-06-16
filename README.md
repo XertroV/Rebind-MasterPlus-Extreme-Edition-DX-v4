@@ -1,28 +1,29 @@
-# Quick Rebind (Openplanet Plugin for TM2020)
+# Rebind Master+ Extreme Edition DX v4
 
-This plugin adds a menu to the Openplanet menubar that let's you rebind any button very quickly.
-It (hopefully!) can do everything that the main menu input settings can do.
+### FEATURES
 
-todo:
+With your purchase of the *FREE* **Rebind Master+ Extreme Edition DX v4** you can rest safe knowing that these industry guarantees safeguard your invenstment in your new **Rebind Master+ Extreme Edition DX v4**, a plugin that will surely service your every binding, unbinding, and rebinding need, regardless of when, where, or why you have that particular need.
 
-- [ ] abort operation on change of scene
+| | Rebind Master+ Extreme Edition DX v4 | Nadeo |
+| --- | --- | --- |
+| Ctrl+U unbind shortcut | ✔✅ | ❌ |
+| Smooth and non-stuttery | ✔ | ❌ |
+| Safe during the heat of battle | ✔ | ❌ |
+| Stylishly minimal | ✔ | ❌ |
+| Easy, convenient access | ✔ | ❌ |
+| Chance of breaking your game if you have a binding dialog open at the wrong time | < 5%* | 100% |
+| Supported by Ubisoft | ❌ | ✔ |
+| Supports Keyboard, GamePad, and Mouse | ✔ | ✔ |
+| Is functional | ✔ | ✔ |
+| Written during an afternoon | ✔ | ❌ |
 
-### Menu Structure
+\*: Estimate. it's hard/unreliable to trigger even if you know how.
 
-* Section: Selected Input
-  * [ ] Mouse
-  * [x] Keyboard
-  * [ ] Gamepad1
-  * [ ] Gamepad2
-* Section: Device
-  * Unbind one button
-* Section: Player Bindings
-  * Accelerate: Up
-  * Brake: Down, Shift
-  * ...
-* Section: Other Bindings
-  * Show/Hide Ghost: G
-  * ...
+Note: the menu is disabled when it's unsafe to rebind. If you can click it, it's safe (AFAIK).
+
+Ofc, no guarantees.
+If you've got an important match, it's better to like plan and stuff. You know, have a checklist or something. (IDK i'm from bonk div.)
+But the Rebind Master+ Extreme Edition DX v4 is here if you need it.
 
 ### Feedback options
 
@@ -33,6 +34,6 @@ todo:
 
 GitHub Repo: [https://github.com/XertroV/tm-quick-rebind](https://github.com/XertroV/tm-quick-rebind)
 
-License: MIT
+License: the unlicense (Public Domain)
 
 GL HF

@@ -25,6 +25,12 @@ void AsyncLoop_AbortBindingDialogsWhenDangerous() {
                 uiDialogSafe = true;
             } else if (lastUiSequence > 2 || lastUiSequence == 0) {
                 uiDialogSafe = false;
+            } else if (lastUiSequence == 1 && timeInGame > 5000) {
+                // if no other conditions have triggered and we're playing, set to true after a few seconds.
+                //
+                // why wait? b/c sometimes the UI sequence is set to 1 during 'synchronization' and during
+                // that time you can break stuff if you open a dialog (even with the abort loop)
+                uiDialogSafe = true;
             }
         }
         lastNow = Time::Now;
