@@ -12,7 +12,7 @@ With your purchase of the *FREE* **Rebind Master+ Extreme Edition DX v4** you ca
 | Stylishly minimal | ✅ | ❌ |
 | Easy, convenient access | ✅ | ❌ |
 | Chance of breaking your game if you have a binding dialog open at the wrong time | < 5%* | 100% |
-| Supported by Ubisoft | ❌ | ✅ |
+| Supported by Ubisoft | ❌ | ❌ |
 | Supports Keyboard, GamePad, and Mouse | ✅ | ✅ |
 | Is functional | ✅ | ✅ |
 | Written during an afternoon | ✅ | ❌ |
