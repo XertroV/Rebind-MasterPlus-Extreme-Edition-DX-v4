@@ -6,16 +6,16 @@ With your purchase of the *FREE* **Rebind Master+ Extreme Edition DX v4** you ca
 
 | | Rebind Master+ Extreme Edition DX v4 | Nadeo |
 | --- | --- | --- |
-| Ctrl+U unbind shortcut | ✔✅ | ❌ |
-| Smooth and non-stuttery | ✔ | ❌ |
-| Safe during the heat of battle | ✔ | ❌ |
-| Stylishly minimal | ✔ | ❌ |
-| Easy, convenient access | ✔ | ❌ |
+| Ctrl+U unbind shortcut | ✅ | ❌ |
+| Smooth and non-stuttery | ✅ | ❌ |
+| Safe during the heat of battle | ✅ | ❌ |
+| Stylishly minimal | ✅ | ❌ |
+| Easy, convenient access | ✅ | ❌ |
 | Chance of breaking your game if you have a binding dialog open at the wrong time | < 5%* | 100% |
-| Supported by Ubisoft | ❌ | ✔ |
-| Supports Keyboard, GamePad, and Mouse | ✔ | ✔ |
-| Is functional | ✔ | ✔ |
-| Written during an afternoon | ✔ | ❌ |
+| Supported by Ubisoft | ❌ | ✅ |
+| Supports Keyboard, GamePad, and Mouse | ✅ | ✅ |
+| Is functional | ✅ | ✅ |
+| Written during an afternoon | ✅ | ❌ |
 
 \*: Estimate. it's hard/unreliable to trigger even if you know how.
 
