@@ -1,3 +1,7 @@
+CTrackMania@ GetTmApp() {
+   return cast<CTrackMania>(GetApp());
+}
+
 string GetMapId() {
 #if TMNEXT || MP4
   if (GetApp().RootMap is null) {

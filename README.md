@@ -1,15 +1,24 @@
-# Never Give Up (Openplanet Plugin for TM2020)
+# Quick Rebind (Openplanet Plugin for TM2020)
 
-This plugin will give you an easy button to unbind 'Give Up' in COTD (and ranked), along with a high-visibility reminder prompt that will automatically disappear when 'Give Up' is unbound.
-When you return to a menu or different game mode, you'll be prompted to rebind 'Give Up' (with a button to do so).
+This plugin adds a menu to the Openplanet menubar that let's you rebind any button very quickly.
+It (hopefully!) can do everything that the main menu input settings can do.
 
-To experiment with the plugin, uncheck the "Hide UI in menus and for other game modes?" setting. The UI should be visible.
+### Menu Structure
 
-To use the buttons, the OpenPlanet overlay must be shown/visible -- otherwise buttons don't work.
-
-You can easily hide the prompt with one-click if you want it to go away for that session. (It will show up again the next time you're in an appropriate game mode.)
-
-You can optionally set additional game modes.
+* Section: Selected Input
+  * [ ] Mouse
+  * [x] Keyboard
+  * [ ] Gamepad1
+  * [ ] Gamepad2
+* Section: Device
+  * Unbind one button
+* Section: Player Bindings
+  * Accelerate: Up
+  * Brake: Down, Shift
+  * ...
+* Section: Other Bindings
+  * Show/Hide Ghost: G
+  * ...
 
 ### Feedback options
 
