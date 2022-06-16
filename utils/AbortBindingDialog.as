@@ -14,7 +14,9 @@ void AsyncLoop_AbortBindingDialogsWhenDangerous() {
                 GI::GetApp().Operation_Abort();
             }
         }
-        if (GI::InMainMenu()) {
+        if (GI::GetApp().Operation_InProgress) {
+            uiDialogSafe = false;
+        } else if (GI::InMainMenu()) {
             uiDialogSafe = true;
         } else if (!GI::InGame() || GI::IsLoadingScreen()) {
             timeInGame = lastNow = 0;
