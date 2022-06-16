@@ -8,8 +8,8 @@ namespace Menu {
     int selectedPadIx = -1;
     bool _enabled = false;
 
-    UI::Font@ sectionLabel = UI::LoadFont("fonts/Lato-MediumItalic.ttf", 16, -1, -1, true, true);
-    UI::Font@ normalFont = UI::LoadFont("fonts/Lato-Regular.ttf", 16, -1, -1, true, true);
+    UI::Font@ fontSectionLabel = UI::LoadFont("fonts/Lato-MediumItalic.ttf", 16, -1, -1, true, true);
+    UI::Font@ fontWarning = UI::LoadFont("fonts/Lato-BlackItalic.ttf", 30, -1, -1, true, true);
 
     string grp(const string &in s) {
         return "\\$<" + s + "\\$>";
@@ -17,6 +17,14 @@ namespace Menu {
 
     string mainColor(const string &in s) {
         return grp(MAIN_COLOR + s);
+    }
+
+    string UE(const string &in s) {
+        if (Setting_UberExtremo) {
+            return rainbowLoopColorCycle(s, true);
+        } else {
+            return s;
+        }
     }
 
     const string GetIcon(CInputScriptPad@ pad = null) {
@@ -39,15 +47,22 @@ namespace Menu {
 
     /********/
 
+    const string MenuL_Bindings = " Bindings";
+
     void RenderMenuMain() {
         _enabled = IsUiDialogSafe();
         if (!Setting_Enabled) return;
-        // UI::PushFont(normalFont);
         UI::PushStyleColor(UI::Col::TextDisabled, L_GRAY_VEC);
-        bool menuOpen = UI::BeginMenu(mainColor(CurrIcon) + " Bindings", _enabled);
-        if (!_enabled && UI::IsItemHovered()) {
-            // true if the disabled menubar menuitem is hovered.
+        auto menuLabel = !Setting_UberExtremo ? MenuL_Bindings : MenuL_Bindings.ToUpper();
+        bool menuOpen = UI::BeginMenu(mainColor(CurrIcon) + menuLabel, _enabled);
+        if (!_enabled) {
+            //if the disabled menubar menuitem is hovered. Hover logic handled by AddSimpleTooltip -- however, IsItemHovered doesn't work on disabled items??!
             AddSimpleTooltip("\\$f62" + "Sorry, it's unsafe to bind keys right now.");
+        }
+        if (_enabled && Setting_UberExtremo) {
+            UI::PushFont(fontWarning);
+            AddSimpleTooltip("Last warning...");
+            UI::PopFont();
         }
         if (menuOpen) {
             int tfs = 0
@@ -92,7 +107,7 @@ namespace Menu {
 
     void MenuLabelSep(const string &in l, bool padAbove = false) {
         if (padAbove) UI::Dummy(vec2(0, 0));
-        UI::PushFont(sectionLabel);
+        UI::PushFont(fontSectionLabel);
         UI::TextDisabled("  " + l + "  ");
         UI::Separator();
         UI::PopFont();
@@ -118,8 +133,8 @@ namespace Menu {
             if (selectedPadIx < 0 && FromEPadType(pad.Type) == Setting_PadType) {
                 OnSelectedPad(i);
             }
-            string padName = GetIcon(pad) + " " + pad.ModelName;
-            if (MenuItemNoClose(padName, '', int(i) == selectedPadIx)) {
+            string padName = "^ " + pad.ModelName;
+            if (MenuItemNoClose(UE(padName).Replace("^", GetIcon(pad)), UE(''), int(i) == selectedPadIx)) {
                 OnSelectedPad(i);
             }
         }
@@ -148,7 +163,7 @@ namespace Menu {
     }
 
     void ListDeviceSettings() {
-        if (UI::MenuItem("Unbind one button", "Ctrl+U", false, _enabled)) {
+        if (UI::MenuItem(UE("Unbind one button"), UE("Ctrl+U"), false, _enabled)) {
             GI::UnbindInput(GetPad(selectedPadIx));
         }
     }
@@ -169,8 +184,8 @@ namespace Menu {
         auto mspa = GI::GetManiaPlanetScriptApi();
         auto bindings = mspa.InputBindings_Bindings;
         auto actions = mspa.InputBindings_ActionNames;
-        for (uint i = start; i < Math::Min(start + length, bindings.Length); i++) {
-            if (UI::MenuItem(actions[i], bindings[i], false, _enabled)) {
+        for (uint i = start; i < uint(Math::Min(start + length, bindings.Length)); i++) {
+            if (UI::MenuItem(UE(actions[i]), UE(bindings[i]), false, _enabled)) {
                 debugPrint("Clicked: " + actions[i]);
                 GI::BindInput(i, GetCurrPad());
             }
