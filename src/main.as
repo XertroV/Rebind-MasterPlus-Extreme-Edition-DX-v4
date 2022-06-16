@@ -28,7 +28,6 @@ void RenderInterface() {
 }
 
 void Render() {
-   Wizard::Render();
 }
 
 void RenderMenuMain() {
