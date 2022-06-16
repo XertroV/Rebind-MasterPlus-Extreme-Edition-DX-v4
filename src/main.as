@@ -15,6 +15,8 @@ void Main() {
 }
 
 void OnSettingsChanged() {
+   // todo: this doesn't update stuff right.
+   Menu::OnSettingsChanged();
 }
 
 void RenderMenu() {

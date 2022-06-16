@@ -37,6 +37,10 @@ namespace Menu {
     }
     string CurrIcon = GetIcon();
 
+    void OnSettingsChanged() {
+        CurrIcon = GetIcon();
+    }
+
     /********/
 
     void RenderPluginMenuItem() {
