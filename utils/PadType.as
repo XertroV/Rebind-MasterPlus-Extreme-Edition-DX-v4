@@ -34,3 +34,21 @@ PadType PadTypeFromStr(const string &in  pt) {
    if (pt == "AnyInputDevice") return PadType::AnyInputDevice;
    return PadType::AnyInputDevice;
 }
+
+PadType FromEPadType(CInputScriptPad::EPadType nadeoType) {
+   if (nadeoType == CInputScriptPad::EPadType::Keyboard)
+      return PadType::Keyboard;
+   if (nadeoType == CInputScriptPad::EPadType::Mouse)
+      return PadType::Mouse;
+   return PadType::GamePad;
+}
+
+bool IsKeyboard(PadType t) {
+   return t == PadType::Keyboard;
+}
+bool IsMouse(PadType t) {
+   return t == PadType::Mouse;
+}
+bool IsGamePad(PadType t) {
+   return t == PadType::GamePad;
+}

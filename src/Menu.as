@@ -1,9 +1,12 @@
 namespace Menu {
-    const string MAIN_COLOR = "\\$4af";
+    // const string MAIN_COLOR = "\\$4af";  // blue
+    // const string MAIN_COLOR = "\\$92f";  // purple
+    const string MAIN_COLOR = "\\$5f4";  // green
     const string L_GRAY = "\\$aaa";
     const vec4 L_GRAY_VEC = vec4(2,2,2,1) / vec4(3,3,3,1);
 
     int selectedPadIx = -1;
+    bool _enabled = false;
 
     UI::Font@ sectionLabel = UI::LoadFont("fonts/Lato-MediumItalic.ttf", 16, -1, -1, true, true);
     UI::Font@ normalFont = UI::LoadFont("fonts/Lato-Regular.ttf", 16, -1, -1, true, true);
@@ -17,13 +20,10 @@ namespace Menu {
     }
 
     const string GetIcon(CInputScriptPad@ pad = null) {
-        // if (pad is null)
-        //     @pad = GetCurrPad();
-        if (pad is null)
+        PadType ty = pad !is null ? FromEPadType(pad.Type) : Setting_PadType;
+        if (ty == PadType::Keyboard)
             return Icons::KeyboardO;
-        if (pad.Type == CInputScriptPad::EPadType::Keyboard)
-            return Icons::KeyboardO;
-        if (pad.Type == CInputScriptPad::EPadType::Mouse)
+        if (ty == PadType::Mouse)
             return Icons::Kenney::MouseAlt;
         return Icons::Kenney::GamepadAlt;
     }
@@ -40,11 +40,12 @@ namespace Menu {
     /********/
 
     void RenderMenuMain() {
+        _enabled = IsUiDialogSafe();
         if (!Setting_Enabled) return;
         // UI::PushFont(normalFont);
         UI::PushStyleColor(UI::Col::TextDisabled, L_GRAY_VEC);
 
-        if (UI::BeginMenu(mainColor(CurrIcon) + " Bindings")) {
+        if (UI::BeginMenu(mainColor(CurrIcon) + " Bindings", _enabled)) {
 
             int tfs = 0
                 // | UI::TableFlags::SizingStretchSame
@@ -109,7 +110,7 @@ namespace Menu {
             auto pad = pads[i];
 
             // default to keyboard
-            if (selectedPadIx < 0 && pad.Type == CInputScriptPad::EPadType::Keyboard) {
+            if (selectedPadIx < 0 && FromEPadType(pad.Type) == Setting_PadType) {
                 OnSelectedPad(i);
             }
             string padName = GetIcon(pad) + " " + pad.ModelName;
@@ -121,7 +122,9 @@ namespace Menu {
 
     void OnSelectedPad(int ix) {
         selectedPadIx = ix;
-        GI::GetManiaPlanetScriptApi().InputBindings_UpdateList(CGameManiaPlanetScriptAPI::EInputsListFilter::All, GetPad(ix));
+        auto pad = GetPad(ix);
+        GI::GetManiaPlanetScriptApi().InputBindings_UpdateList(CGameManiaPlanetScriptAPI::EInputsListFilter::All, pad);
+        Setting_PadType = FromEPadType(pad.Type);
     }
 
     CInputScriptPad@ GetPad(uint i) {
@@ -140,7 +143,7 @@ namespace Menu {
     }
 
     void ListDeviceSettings() {
-        if (UI::MenuItem("Unbind one button")) {
+        if (UI::MenuItem("Unbind one button", "Ctrl+U", false, _enabled)) {
             GI::UnbindInput(GetPad(selectedPadIx));
         }
     }
@@ -162,7 +165,7 @@ namespace Menu {
         auto bindings = mspa.InputBindings_Bindings;
         auto actions = mspa.InputBindings_ActionNames;
         for (uint i = start; i < Math::Min(start + length, bindings.Length); i++) {
-            if (UI::MenuItem(actions[i], bindings[i])) {
+            if (UI::MenuItem(actions[i], bindings[i], false, _enabled)) {
                 debugPrint("Clicked: " + actions[i]);
                 GI::BindInput(i, GetCurrPad());
             }

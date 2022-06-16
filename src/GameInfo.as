@@ -1,3 +1,7 @@
+CTrackMania@ GetTmApp() {
+   return cast<CTrackMania>(GetApp());
+}
+
 namespace GI {
     CTrackMania@ GetApp() {
         return GetTmApp();
