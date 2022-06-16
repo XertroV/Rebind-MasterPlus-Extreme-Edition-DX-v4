@@ -34,6 +34,6 @@ But the Rebind Master+ Extreme Edition DX v4 is here if you need it.
 
 GitHub Repo: [https://github.com/XertroV/tm-quick-rebind](https://github.com/XertroV/tm-quick-rebind)
 
-License: the unlicense (Public Domain)
+License: The Unlicense (Public Domain)
 
 GL HF

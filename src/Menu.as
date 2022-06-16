@@ -32,7 +32,7 @@ namespace Menu {
     /********/
 
     void RenderPluginMenuItem() {
-        if (UI::MenuItem(mainColor(CurrIcon) + " Quick Rebind", "", Setting_Enabled)) {
+        if (UI::MenuItem(mainColor(CurrIcon) + " Rebind Master+ Extreme Edition DX v4", "", Setting_Enabled)) {
             Setting_Enabled = !Setting_Enabled;
         }
     }
@@ -45,7 +45,7 @@ namespace Menu {
         // UI::PushFont(normalFont);
         UI::PushStyleColor(UI::Col::TextDisabled, L_GRAY_VEC);
         bool menuOpen = UI::BeginMenu(mainColor(CurrIcon) + " Bindings", _enabled);
-        if (UI::IsItemHovered()) {
+        if (!_enabled && UI::IsItemHovered()) {
             // true if the disabled menubar menuitem is hovered.
             AddSimpleTooltip("\\$f62" + "Sorry, it's unsafe to bind keys right now.");
         }
