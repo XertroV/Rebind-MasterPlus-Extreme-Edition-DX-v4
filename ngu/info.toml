@@ -5,4 +5,4 @@ category    = "Race"
 version     = "0.2.6"
 
 [script]
-# defines     = [ "DEV" ]
+#__DEFINES__

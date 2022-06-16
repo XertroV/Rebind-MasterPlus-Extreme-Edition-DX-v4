@@ -42,3 +42,10 @@ DialogInputSettings_OnBindingsUnbindKey
 DialogInGameMenuAdvanced_OnInputSettings
 
 (note: these don't work)
+
+
+# unbind a button
+
+`ManiaPlanet.Dialog_BindInput(-1, Pad);`
+
+source: inputsapi.script.txt

@@ -98,7 +98,7 @@ bool IsGiveUpBound() {
    for (uint i = 0; i < pads.Length; i++) {
       auto pad = pads[i];
       if (!CheckPadOkaySettings(pad)) continue;
-      mpsa.InputBindings_UpdateList(CGameManiaPlanetScriptAPI::EInputsListFilter::OnlyPlayer, pad);
+      mpsa.InputBindings_UpdateList(CGameManiaPlanetScriptAPI::EInputsListFilter::All, pad);
       uint giveUpIx = GetActionIndex(GIVE_UP_ACTION_NAME);
       string currBindings = string(mpsa.InputBindings_Bindings[giveUpIx]);
       if (currBindings.Length > 0) {

@@ -65,6 +65,7 @@ for pluginSrc in ${pluginSources[@]}; do
       cp -LR -v ./$pluginSrc/* $_build_dest/
       _copy_exit_code="$?"
       sed -i 's/^\(name[ \t="]*\)\(.*\)"/\1\2 (Dev)"/' $_build_dest/info.toml
+      sed -i 's/^#__DEFINES__/defines = ["DEV"]/' $_build_dest/info.toml
       export PLUGIN_PRETTY_NAME="${PLUGIN_PRETTY_NAME} \(Dev\)"
       # diff $pluginSrc/info.toml $_build_dest/info.toml
       # cat $_build_dest/info.toml
