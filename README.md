@@ -28,11 +28,11 @@ But the Rebind Master+ Extreme Edition DX v4 is here if you need it.
 ### Feedback options
 
 - @XertroV on [OpenPlanet Discord](https://openplanet.dev/link/discord)
-- [Create GitHub Issue](https://github.com/XertroV/tm-quick-rebind/issues/)
+- [Create GitHub Issue](https://github.com/XertroV/Rebind-MasterPlus-Extreme-Edition-DX-v4/issues/)
 
 ### Code
 
-GitHub Repo: [https://github.com/XertroV/tm-quick-rebind](https://github.com/XertroV/tm-quick-rebind)
+GitHub Repo: [https://github.com/XertroV/Rebind-MasterPlus-Extreme-Edition-DX-v4](https://github.com/XertroV/Rebind-MasterPlus-Extreme-Edition-DX-v4)
 
 License: The Unlicense (Public Domain)
 
