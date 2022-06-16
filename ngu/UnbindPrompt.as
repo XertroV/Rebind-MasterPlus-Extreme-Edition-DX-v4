@@ -169,6 +169,8 @@ class UnbindPrompt {
 
         show = show || (inMenu && !isGiveUpBound);
 
+        show = show && HasOkayPad();  // only show if we have an appropriate pad
+
         // if HWI is false and WizardShouldRun is true, then hideWhenIrrelevant is false.
         bool hideWhenIrrelevant = !(!Setting_HideWhenIrrelevant || State_WizardShouldRun);
         bool isPreview = State_WizardShouldRun;

@@ -85,6 +85,14 @@ uint GetActionIndex(const string &in actionName) {
    return 0xffffff;
 }
 
+bool HasOkayPad() {
+   auto pads = GetTmApp().InputPort.Script_Pads;
+   for (uint i = 0; i < pads.Length; i++) {
+      if (CheckPadOkaySettings(pads[i])) return true;
+   }
+   return false;
+}
+
 bool IsGiveUpBound() {
    // seems like this is somewhat problematic, so just use the other way that should be more robust.
    // return IsGiveUpBoundAux();
@@ -136,10 +144,7 @@ bool IsGiveUpBoundAux() {
       trace("GiveUp bindings: " + binding);
       prevBindings = binding;
    }
-   if (giveUpBindings.Length == 0) {
-      return false;
-   }
-   return true;
+   return giveUpBindings.Length > 0;
 }
 
 
