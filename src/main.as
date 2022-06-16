@@ -15,11 +15,6 @@ void Main() {
 }
 
 void OnSettingsChanged() {
-   // unbindPrompt.OnSettingsChanged();
-   // auto mpsa = GI::GetManiaPlanetScriptApi();
-   // if (mpsa !is null) {
-   //    mpsa.InputBindings_UpdateList(CGameManiaPlanetScriptAPI::EInputsListFilter::All, null);
-   // }
 }
 
 void RenderMenu() {

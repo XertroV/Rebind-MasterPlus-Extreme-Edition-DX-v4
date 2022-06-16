@@ -3,6 +3,10 @@
 This plugin adds a menu to the Openplanet menubar that let's you rebind any button very quickly.
 It (hopefully!) can do everything that the main menu input settings can do.
 
+todo:
+
+- [ ] abort operation on change of scene
+
 ### Menu Structure
 
 * Section: Selected Input
@@ -23,19 +27,11 @@ It (hopefully!) can do everything that the main menu input settings can do.
 ### Feedback options
 
 - @XertroV on [OpenPlanet Discord](https://openplanet.dev/link/discord)
-- [Create GitHub Issue](https://github.com/XertroV/tm-never-give-up/issues/)
-
-### Dialog Bug Details
-
-**FIXED:** *v0.2.4 Adds a workaround for this issue to abort the dialog and prevent the bug from happening! Yay!*
-
-If you have the bind/unbind dialog open, and the game does certain things (like joining maps, or certain in-game events), then the game becomes unplayable. The dialog goes away, but nearly all inputs are dropped after this point.
-
-I guess that the 'bind input' dialog needs to redirect inputs to itself, but when they game removes the dialog it does not clean up the input redirection.
+- [Create GitHub Issue](https://github.com/XertroV/tm-quick-rebind/issues/)
 
 ### Code
 
-GitHub Repo: [https://github.com/XertroV/tm-never-give-up](https://github.com/XertroV/tm-never-give-up)
+GitHub Repo: [https://github.com/XertroV/tm-quick-rebind](https://github.com/XertroV/tm-quick-rebind)
 
 License: MIT
 
