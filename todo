@@ -1,0 +1,3 @@
+- shortcut works when plugin is disabled
+- interaction with NGU
+  - soln?: cache bindings on menu open or change
