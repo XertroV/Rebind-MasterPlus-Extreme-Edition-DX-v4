@@ -16,6 +16,7 @@ With your purchase of the *FREE* **Rebind Master+ Extreme Edition DX v4** you ca
 | Supports Keyboard, GamePad, and Mouse | ✅ | ✅ |
 | Is functional | ✅ | ✅ |
 | Written during an afternoon | ✅ | ❌ |
+| ■■■■ ■■■■■■■ | ✅ | ❌ |
 
 \*: Estimate. it's hard/unreliable to trigger even if you know how.
 
