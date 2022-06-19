@@ -43,6 +43,13 @@ namespace Menu {
 
     void OnSettingsChanged() {
         CurrIcon = GetIcon();
+        selectedPadIx = GetPreferredPadIx();
+        // if we don't have a suitable pad then remove all the bindings until a new device is selected.
+        if (selectedPadIx < 0) {
+            for (uint i = 0; i < bindings.Length; i++) {
+                bindings[i] = '';
+            }
+        }
     }
 
     /********/
@@ -74,15 +81,10 @@ namespace Menu {
         }
         if (menuOpen) {
             if (UI::IsWindowAppearing()) {
-                // print("appearing");
-                if (selectedPadIx >= 0)
-                    RecachePadBindings(GetCurrPad());
+                trace("appearing. selected pad ix: " + selectedPadIx);
+                OnWindowAppearing();
             }
-            int tfs = 0
-                // | UI::TableFlags::SizingStretchSame
-                // | UI::TableFlags::SizingFixedFit
-                ;
-            if (UI::BeginTable("bindings-menu-table", 2, tfs)) {
+            if (UI::BeginTable("bindings-menu-table", 2)) {
                 UI::TableSetupColumn("l", UI::TableColumnFlags::WidthFixed, 300);
                 UI::TableSetupColumn("r", UI::TableColumnFlags::WidthFixed, 300);
 
@@ -114,6 +116,13 @@ namespace Menu {
 
         UI::PopStyleColor(1);
         // UI::PopFont();
+    }
+
+    void OnWindowAppearing() {
+        if (selectedPadIx < 0 || selectedPadIx >= int(GetPads().Length)) {
+            selectedPadIx = GetPreferredPadIx();
+        }
+        RecachePadBindings(GetCurrPad());
     }
 
     /********/
@@ -183,7 +192,7 @@ namespace Menu {
 
     CInputScriptPad@ GetPad(uint i) {
         auto pads = GetPads();
-        if (i > pads.Length)
+        if (i >= pads.Length)
             return null;
         return pads[i];
     }
@@ -194,6 +203,17 @@ namespace Menu {
 
     MwFastBuffer<CInputScriptPad@> GetPads() {
         return GI::GetInputPort().Script_Pads;
+    }
+
+    int GetPreferredPadIx() {
+        auto pads = GetPads();
+        auto preferredType = Setting_PadType;
+        for (uint i = 0; i < pads.Length; i++) {
+            if (FromEPadType(pads[i].Type) == preferredType) {
+                return i;
+            }
+        }
+        return -1;
     }
 
     void ListDeviceSettings() {
