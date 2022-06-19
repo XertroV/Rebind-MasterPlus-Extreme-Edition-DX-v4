@@ -51,14 +51,16 @@ void debugPrint(const string &in msg) {
 
 bool ctrlDown = false;
 void OnKeyPress(bool down, VirtualKey key) {
-   if (key == VirtualKey::Control) {
-      ctrlDown = down;
-   } else if (ctrlDown && key == VirtualKey::U && down) {
-      if (IsUiDialogSafe()) {
-         GI::UnbindInput(Menu::GetPad(Menu::selectedPadIx));
-      } else {
-         UI::ShowNotification("Not safe to unbind!", "Ignored Ctrl+U because it is not safe to launch an unbind dialog right now.",
-            vec4(1.0, .4, .1, 1));
+   if (Setting_Enabled) {
+      if (key == VirtualKey::Control) {
+         ctrlDown = down;
+      } else if (ctrlDown && key == VirtualKey::U && down) {
+         if (IsUiDialogSafe()) {
+            GI::UnbindInput(Menu::GetPad(Menu::selectedPadIx));
+         } else {
+            UI::ShowNotification("Not safe to unbind!", "Ignored Ctrl+U because it is not safe to launch an unbind dialog right now.",
+               vec4(1.0, .4, .1, 1));
+         }
       }
    }
 }
