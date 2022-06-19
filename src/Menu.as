@@ -11,6 +11,10 @@ namespace Menu {
     UI::Font@ fontSectionLabel = UI::LoadFont("fonts/Lato-MediumItalic.ttf", 16, -1, -1, true, true);
     UI::Font@ fontWarning = UI::LoadFont("fonts/Lato-BlackItalic.ttf", 30, -1, -1, true, true);
 
+    array<string> bindings;
+    array<string> actions;
+    uint playerInputsCount;
+
     string grp(const string &in s) {
         return "\\$<" + s + "\\$>";
     }
@@ -69,6 +73,11 @@ namespace Menu {
             UI::PopFont();
         }
         if (menuOpen) {
+            if (UI::IsWindowAppearing()) {
+                // print("appearing");
+                if (selectedPadIx >= 0)
+                    RecachePadBindings(GetCurrPad());
+            }
             int tfs = 0
                 // | UI::TableFlags::SizingStretchSame
                 // | UI::TableFlags::SizingFixedFit
@@ -147,9 +156,30 @@ namespace Menu {
     void OnSelectedPad(int ix) {
         selectedPadIx = ix;
         auto pad = GetPad(ix);
-        GI::GetManiaPlanetScriptApi().InputBindings_UpdateList(CGameManiaPlanetScriptAPI::EInputsListFilter::All, pad);
         Setting_PadType = FromEPadType(pad.Type);
+        RecachePadBindings(pad);
     }
+
+    void RecachePadBindings(CInputScriptPad@ pad) {
+        if (pad is null) {
+            warn("Not recaching pad bindings b/c pad is null.");
+            return;
+        }
+        trace("Caching Pad Bindings.");
+        auto mspa = GI::GetManiaPlanetScriptApi();
+        mspa.InputBindings_UpdateList(CGameManiaPlanetScriptAPI::EInputsListFilter::All, pad);
+        bindings.RemoveRange(0, bindings.Length);
+        actions.RemoveRange(0, actions.Length);
+        auto b = mspa.InputBindings_Bindings;
+        auto a = mspa.InputBindings_ActionNames;
+        for (uint i = 0; i < b.Length; i++) {
+            bindings.InsertLast(string(b[i]));
+            actions.InsertLast(string(a[i]));
+        }
+        playerInputsCount = GetPlayerInputsCount();
+    }
+
+
 
     CInputScriptPad@ GetPad(uint i) {
         auto pads = GetPads();
@@ -177,17 +207,14 @@ namespace Menu {
     }
 
     void ListPlayerBindings() {
-        ListBindingsFrom(0, GetPlayerInputsCount());
+        ListBindingsFrom(0, playerInputsCount);
     }
 
     void ListOtherBindings() {
-        ListBindingsFrom(GetPlayerInputsCount(), 0xffff);
+        ListBindingsFrom(playerInputsCount, 0xffff);
     }
 
     void ListBindingsFrom(uint start, uint length) {
-        auto mspa = GI::GetManiaPlanetScriptApi();
-        auto bindings = mspa.InputBindings_Bindings;
-        auto actions = mspa.InputBindings_ActionNames;
         for (uint i = start; i < uint(Math::Min(start + length, bindings.Length)); i++) {
             if (UI::MenuItem(UE(actions[i]), UE(bindings[i]), false, _enabled)) {
                 debugPrint("Clicked: " + actions[i]);
