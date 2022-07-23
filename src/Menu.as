@@ -24,11 +24,12 @@ namespace Menu {
     }
 
     string UE(const string &in s) {
-        if (Setting_UberExtremo) {
-            return rainbowLoopColorCycle(s, true);
-        } else {
-            return s;
-        }
+        return s;
+        // if (Setting_UberExtremo) {
+        //     return rainbowLoopColorCycle(s, true);
+        // } else {
+        //     return s;
+        // }
     }
 
     const string GetIcon(CInputScriptPad@ pad = null) {
@@ -68,17 +69,18 @@ namespace Menu {
         _enabled = IsUiDialogSafe();
         if (!Setting_Enabled) return;
         UI::PushStyleColor(UI::Col::TextDisabled, L_GRAY_VEC);
-        auto menuLabel = !Setting_UberExtremo ? MenuL_Bindings : MenuL_Bindings.ToUpper();
+        // auto menuLabel = !Setting_UberExtremo ? MenuL_Bindings : MenuL_Bindings.ToUpper();
+        auto menuLabel = MenuL_Bindings;
         bool menuOpen = UI::BeginMenu(mainColor(CurrIcon) + menuLabel, _enabled);
         if (!_enabled) {
             //if the disabled menubar menuitem is hovered. Hover logic handled by AddSimpleTooltip -- however, IsItemHovered doesn't work on disabled items??!
             AddSimpleTooltip("\\$f62" + "Sorry, it's unsafe to bind keys right now.");
         }
-        if (_enabled && Setting_UberExtremo) {
-            UI::PushFont(fontWarning);
-            AddSimpleTooltip("Last warning...");
-            UI::PopFont();
-        }
+        // if (_enabled && Setting_UberExtremo) {
+        //     UI::PushFont(fontWarning);
+        //     AddSimpleTooltip("Last warning...");
+        //     UI::PopFont();
+        // }
         if (menuOpen) {
             if (UI::IsWindowAppearing()) {
                 trace("appearing. selected pad ix: " + selectedPadIx);
