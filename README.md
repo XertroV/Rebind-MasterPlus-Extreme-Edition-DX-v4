@@ -1,10 +1,10 @@
-# Rebind Master+ Extreme Edition DX v4
+# Rebind Master+
 
 ### FEATURES
 
-With your purchase of the *FREE* **Rebind Master+ Extreme Edition DX v4** you can rest safe knowing that these industry guarantees safeguard your invenstment in your new **Rebind Master+ Extreme Edition DX v4**, a plugin that will surely service your every binding, unbinding, and rebinding need, regardless of when, where, or why you have that particular need.
+With your purchase of the *FREE* **Rebind Master+** you can rest safe knowing that these industry guarantees safeguard your invenstment in your new **Rebind Master+**, a plugin that will surely service your every binding, unbinding, and rebinding need, regardless of when, where, or why you have that particular need.
 
-| | Rebind Master+ Extreme Edition DX v4 | Nadeo |
+| | Rebind Master+ | Nadeo |
 | --- | --- | --- |
 | Ctrl+U unbind shortcut | ✅ | ❌ |
 | Smooth and non-stuttery | ✅ | ❌ |
@@ -24,7 +24,7 @@ Note: the menu is disabled when it's unsafe to rebind. If you can click it, it's
 
 Ofc, no guarantees.
 If you've got an important match, it's better to like plan and stuff. You know, have a checklist or something. (IDK i'm from bonk div.)
-But the Rebind Master+ Extreme Edition DX v4 is here if you need it.
+But the Rebind Master+ is here if you need it.
 
 ### Feedback options
 

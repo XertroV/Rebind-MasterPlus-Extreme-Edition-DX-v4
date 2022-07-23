@@ -1,4 +1,4 @@
-const string PLUGIN_TITLE = "Rebind Master+ Extreme Edition DX v4";
+const string PLUGIN_TITLE = "Rebind Master+";
 
 void Main() {
 #if TMNEXT

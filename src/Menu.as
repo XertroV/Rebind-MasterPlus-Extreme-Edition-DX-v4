@@ -55,7 +55,7 @@ namespace Menu {
     /********/
 
     void RenderPluginMenuItem() {
-        if (UI::MenuItem(mainColor(CurrIcon) + " Rebind Master+ Extreme Edition DX v4", "", Setting_Enabled)) {
+        if (UI::MenuItem(mainColor(CurrIcon) + " Rebind Master+", "", Setting_Enabled)) {
             Setting_Enabled = !Setting_Enabled;
         }
     }
