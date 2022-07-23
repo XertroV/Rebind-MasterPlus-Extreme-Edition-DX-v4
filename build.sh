@@ -1,5 +1,10 @@
 #!/usr/bin/env bash
 
+# USAGE:
+# - Set PLUGINS_DIR to wherever OpenplanetNext/Plugins lives
+# ./build.sh [dev|release]
+# Defaults to `dev` build mode.
+
 # https://greengumdrops.net/index.php/colorize-your-bash-scripts-bash-color-library/
 source ./vendor/_colors.bash
 
@@ -20,7 +25,8 @@ pluginSources=( 'src' )
 
 for pluginSrc in ${pluginSources[@]}; do
   # if we don't have `dos2unix` below then we need to add `\r` to the `tr -d`
-  PLUGIN_PRETTY_NAME="$(cat ./$pluginSrc/info.toml | dos2unix | grep '^name' | cut -f 2 -d '=' | tr -d '\"\r' | sed 's/^[ ]*//')"
+  PLUGIN_PRETTY_NAME="$(cat ./info.toml | dos2unix | grep '^name' | cut -f 2 -d '=' | tr -d '\"\r' | sed 's/^[ ]*//')"
+  PLUGIN_VERSION="$(cat ./info.toml | dos2unix | grep '^version' | cut -f 2 -d '=' | tr -d '\"\r' | sed 's/^[ ]*//')"
 
   # prelim stuff
   case $_build_mode in
@@ -48,16 +54,18 @@ for pluginSrc in ${pluginSources[@]}; do
   _colortext16 green "✅ Output file/folder name: ${PLUGIN_NAME}"
 
   BUILD_NAME=$PLUGIN_NAME-$(date +%s).zip
-  RELEASE_NAME=$PLUGIN_NAME-latest.op
+  RELEASE_NAME=$PLUGIN_NAME-$PLUGIN_VERSION.op
   PLUGINS_DIR=${PLUGINS_DIR:-$HOME/win/OpenplanetNext/Plugins}
   PLUGIN_DEV_LOC=$PLUGINS_DIR/$PLUGIN_NAME
   PLUGIN_RELEASE_LOC=$PLUGINS_DIR/$RELEASE_NAME
 
-  7z a ./$BUILD_NAME ./$pluginSrc/* ./LICENSE ./README.md
+  function buildPlugin {
+    7z a ./$BUILD_NAME ./$pluginSrc/* ./LICENSE ./README.md
 
-  cp -v $BUILD_NAME $RELEASE_NAME
+    cp -v $BUILD_NAME $RELEASE_NAME
 
-  _colortext16 green "\n✅ Built plugin as ${BUILD_NAME} and copied to ./${RELEASE_NAME}.\n"
+    _colortext16 green "\n✅ Built plugin as ${BUILD_NAME} and copied to ./${RELEASE_NAME}.\n"
+  }
 
   # this case should set both _copy_exit_code and _build_dest
 
@@ -69,6 +77,7 @@ for pluginSrc in ${pluginSources[@]}; do
       mkdir -p $_build_dest/
       rm -vr $_build_dest/*
       cp -LR -v ./$pluginSrc/* $_build_dest/
+      cp -LR -v ./info.toml $_build_dest/
       _copy_exit_code="$?"
       ;;
   esac
@@ -80,19 +89,25 @@ for pluginSrc in ${pluginSources[@]}; do
       ;;
     prerelease)
       sed -i 's/^\(name[ \t="]*\)\(.*\)"/\1\2 (Prerelease)"/' $_build_dest/info.toml
+      sed -i 's/^#__DEFINES__/defines = ["RELEASE"]/' $_build_dest/info.toml
       ;;
     unittest)
       sed -i 's/^\(name[ \t="]*\)\(.*\)"/\1\2 (UnitTest)"/' $_build_dest/info.toml
       sed -i 's/^#__DEFINES__/defines = ["UNIT_TEST"]/' $_build_dest/info.toml
       ;;
     release)
+      cp ./info.toml ./$pluginSrc/info.toml
+      sed -i 's/^#__DEFINES__/defines = ["RELEASE"]/' ./$pluginSrc/info.toml
+      buildPlugin
+      rm ./$pluginSrc/info.toml
       _build_dest=$PLUGIN_RELEASE_LOC
-      cp -v $RELEASE_NAME $_build_dest
+      # cp -v $RELEASE_NAME $_build_dest
       _copy_exit_code="$?"
       ;;
     *)
       _colortext16 red "\n⚠ Error: unknown build mode: $_build_mode"
   esac
+
 
   echo ""
   if [[ "$_copy_exit_code" != "0" ]]; then
@@ -100,19 +115,19 @@ for pluginSrc in ${pluginSources[@]}; do
     _colortext16 red "⚠ Error: could not copy plugin to Trackmania directory. You might need to click\n\t\`F3 > Scripts > TogglePlugin > PLUGIN\`\nto unlock the file for writing."
     _colortext16 red "⚠   Also, \"Stop Recent\" and \"Reload Recent\" should work, too, if the plugin is the \"recent\" plugin."
   else
-    _colortext16 green "✅ Copied plugin to Trackmania directory: ${_build_dest}"
+    _colortext16 green "✅ Built release version: ${RELEASE_NAME}"
   fi
 
 
-  # cleanup
-  case $_build_mode in
-    dev)
-      # remove the build artifact b/c they'll just take up space
-      (rm $BUILD_NAME && _colortext16 green "✅ Removed ${BUILD_NAME}") || _colortext16 red "Failed to remove ${BUILD_NAME}."
-      ;;
-    *)
-      ;;
-  esac
+  # # cleanup
+  # case $_build_mode in
+  #   dev)
+  #     # remove the build artifact b/c they'll just take up space
+  #     (rm $BUILD_NAME && _colortext16 green "✅ Removed ${BUILD_NAME}") || _colortext16 red "Failed to remove ${BUILD_NAME}."
+  #     ;;
+  #   *)
+  #     ;;
+  # esac
 
 done
 

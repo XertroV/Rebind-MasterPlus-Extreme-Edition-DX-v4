@@ -16,7 +16,6 @@ With your purchase of the *FREE* **Rebind Master+** you can rest safe knowing th
 | Supports Keyboard, GamePad, and Mouse | ✅ | ✅ |
 | Is functional | ✅ | ✅ |
 | Written during an afternoon | ✅ | ❌ |
-| ■■■■ ■■■■■■■ | ✅ | ❌ |
 
 \*: Estimate. it's hard/unreliable to trigger even if you know how.
 
