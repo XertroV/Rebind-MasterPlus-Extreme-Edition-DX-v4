@@ -8,8 +8,8 @@ namespace Menu {
     int selectedPadIx = -1;
     bool _enabled = false;
 
-    UI::Font@ fontSectionLabel = UI::LoadFont("fonts/Lato-MediumItalic.ttf", 16, -1, -1, true, true);
-    UI::Font@ fontWarning = UI::LoadFont("fonts/Lato-BlackItalic.ttf", 30, -1, -1, true, true);
+    // UI::Font@ fontSectionLabel = UI::LoadFont("fonts/Lato-MediumItalic.ttf", 16, -1, -1, true, true);
+    // UI::Font@ fontWarning = UI::LoadFont("fonts/Lato-BlackItalic.ttf", 30, -1, -1, true, true);
 
     array<string> bindings;
     array<string> actions;
@@ -131,10 +131,10 @@ namespace Menu {
 
     void MenuLabelSep(const string &in l, bool padAbove = false) {
         if (padAbove) UI::Dummy(vec2(0, 0));
-        UI::PushFont(fontSectionLabel);
+        // UI::PushFont(fontSectionLabel);
         UI::TextDisabled("  " + l + "  ");
         UI::Separator();
-        UI::PopFont();
+        // UI::PopFont();
     }
 
     void MenuMinWidth() {
