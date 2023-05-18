@@ -87,8 +87,8 @@ namespace Menu {
                 OnWindowAppearing();
             }
             if (UI::BeginTable("bindings-menu-table", 2)) {
-                UI::TableSetupColumn("l", UI::TableColumnFlags::WidthFixed, 300);
-                UI::TableSetupColumn("r", UI::TableColumnFlags::WidthFixed, 300);
+                UI::TableSetupColumn("l", UI::TableColumnFlags::WidthFixed, 300 * UI::GetScale());
+                UI::TableSetupColumn("r", UI::TableColumnFlags::WidthFixed, 300 * UI::GetScale());
 
                 UI::TableNextRow();
 
@@ -237,8 +237,11 @@ namespace Menu {
     }
 
     void ListBindingsFrom(uint start, uint length) {
+        bool removeInputPrefix = actions.Length > 0 && actions[0].StartsWith('|Input|');
+        uint substrLen = 7;
         for (uint i = start; i < uint(Math::Min(start + length, bindings.Length)); i++) {
-            if (UI::MenuItem(UE(actions[i]), UE(bindings[i]), false, _enabled)) {
+            string actionName = removeInputPrefix ? actions[i].SubStr(substrLen) : actions[i];
+            if (UI::MenuItem(actionName, bindings[i], false, _enabled)) {
                 debugPrint("Clicked: " + actions[i]);
                 GI::BindInput(i, GetCurrPad());
             }

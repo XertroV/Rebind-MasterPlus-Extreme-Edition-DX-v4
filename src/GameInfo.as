@@ -194,24 +194,6 @@ namespace GI {
 
     /* COTD / Game mode stuff */
 
-    bool IsCotdQuali() {
-        auto server_info = GetServerInfo();
-        return PlaygroundNotNull()
-            && server_info.CurGameModeStr == "TM_TimeAttackDaily_Online";
-    }
-
-    bool IsCotdKO() {
-        auto server_info = GetServerInfo();
-        return PlaygroundNotNull()
-            && server_info.CurGameModeStr == "TM_KnockoutDaily_Online";
-    }
-
-    bool IsCotd() {
-        auto server_info = GetServerInfo();
-        return PlaygroundNotNull()
-            && (server_info.CurGameModeStr == "TM_TimeAttackDaily_Online" || server_info.CurGameModeStr == "TM_KnockoutDaily_Online");
-    }
-
     string MapId() {
         auto rm = GetApp().RootMap;
         return (rm is null) ? "" : rm.IdName;
