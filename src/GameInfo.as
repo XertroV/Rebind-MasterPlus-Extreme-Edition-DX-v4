@@ -172,6 +172,10 @@ namespace GI {
         return PlaygroundNotNull() && (string(GetServerInfo().CurGameModeStr).Length > 0);
     }
 
+    bool InEditor() {
+        return GetApp().Editor !is null;
+    }
+
     uint GameTimeMsLeft() {
         if (GetCurrentPlayground() is null || GetManiaAppPlayground() is null
             || GetCurrentPlayground().Arena is null
