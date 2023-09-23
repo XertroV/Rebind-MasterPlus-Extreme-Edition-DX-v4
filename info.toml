@@ -2,7 +2,7 @@
 name        = "Rebind Master+"
 author      = "XertroV"
 category    = "Utilities"
-version     = "1.0.6"
+version     = "1.0.7"
 
 [script]
 #__DEFINES__
