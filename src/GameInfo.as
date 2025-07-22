@@ -93,6 +93,12 @@ namespace GI {
         return GetTmApp().ManiaPlanetScriptAPI;
     }
 
+    CGameUserScript@ GetUser0Script() {
+        auto userMgr = GetCoreUserManagerScript();
+        if (userMgr.Users.Length == 0) return null;
+        return userMgr.Users[0];
+    }
+
     /* UI Sequence
         CGamePlaygroundUIConfig::EUISequence {
             0=None, 1=Playing, 2=Intro, 3=Outro, 4=Podium, CustomMTClip, 6=EndRound,

@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 
+set -e
+
 # USAGE:
 # - Set PLUGINS_DIR to wherever OpenplanetNext/Plugins lives
 # ./build.sh [dev|release]
@@ -49,17 +51,19 @@ for pluginSrc in ${pluginSources[@]}; do
 
   # remove parens, replace spaces with dashes, and uppercase characters with lowercase ones
   # => `Never Give Up (Dev)` becomes `never-give-up-dev`
-  PLUGIN_NAME=$(echo "$PLUGIN_PRETTY_NAME" | tr -d '(),;'\''"' | tr 'A-Z ' 'a-z-')
+  PLUGIN_NAME=$(echo "$PLUGIN_PRETTY_NAME" | tr -d '(),:;'\''"' | tr 'A-Z ' 'a-z-')
   # echo $PLUGIN_NAME
   _colortext16 green "✅ Output file/folder name: ${PLUGIN_NAME}"
 
   BUILD_NAME=$PLUGIN_NAME-$(date +%s).zip
   RELEASE_NAME=$PLUGIN_NAME-$PLUGIN_VERSION.op
+  PLUGIN_FOLDER_NAME=$PLUGIN_NAME
   PLUGINS_DIR=${PLUGINS_DIR:-$HOME/win/OpenplanetNext/Plugins}
   PLUGIN_DEV_LOC=$PLUGINS_DIR/$PLUGIN_NAME
   PLUGIN_RELEASE_LOC=$PLUGINS_DIR/$RELEASE_NAME
 
   function buildPlugin {
+    # 7z a ./$BUILD_NAME ./fonts ./$pluginSrc/* ./LICENSE ./README.md
     7z a ./$BUILD_NAME ./$pluginSrc/* ./LICENSE ./README.md
 
     cp -v $BUILD_NAME $RELEASE_NAME
@@ -75,8 +79,11 @@ for pluginSrc in ${pluginSources[@]}; do
       # in case it doesn't exist
       _build_dest=$PLUGIN_DEV_LOC
       mkdir -p $_build_dest/
-      rm -vr $_build_dest/*
+      rm -vr $_build_dest/* || true
       cp -LR -v ./$pluginSrc/* $_build_dest/
+      # cp -LR -v ./fonts $_build_dest/fonts
+      # cp -LR -v ./fonts/* $_build_dest/fonts/
+      # cp -LR -v ./external/* $_build_dest/
       cp -LR -v ./info.toml $_build_dest/
       _copy_exit_code="$?"
       ;;
@@ -115,7 +122,13 @@ for pluginSrc in ${pluginSources[@]}; do
     _colortext16 red "⚠ Error: could not copy plugin to Trackmania directory. You might need to click\n\t\`F3 > Scripts > TogglePlugin > PLUGIN\`\nto unlock the file for writing."
     _colortext16 red "⚠   Also, \"Stop Recent\" and \"Reload Recent\" should work, too, if the plugin is the \"recent\" plugin."
   else
-    _colortext16 green "✅ Built release version: ${RELEASE_NAME}"
+    case $_build_mode in
+      dev|prerelease|unittest)
+        # trigger remote build
+        tm-remote-build load folder "$PLUGIN_FOLDER_NAME" --host 172.18.16.1 --port 30000 -v -d "$HOME/OpenplanetNext/"
+        ;;
+    esac
+    _colortext16 green "✅ Release file: ${RELEASE_NAME}"
   fi
 
 

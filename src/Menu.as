@@ -98,6 +98,8 @@ namespace Menu {
                 ListInputDevices();
                 MenuLabelSep("Device", true);
                 ListDeviceSettings();
+                MenuLabelSep("Toggles", true);
+                ListDeviceToggles();
                 MenuLabelSep("Player Bindings", true);
                 ListPlayerBindings();
 
@@ -221,6 +223,27 @@ namespace Menu {
     void ListDeviceSettings() {
         if (UI::MenuItem(UE("Unbind one button"), UE("Ctrl+U"), false, _enabled)) {
             GI::UnbindInput(GetPad(selectedPadIx));
+        }
+    }
+
+    void ListDeviceToggles() {
+        UI::TextWrapped("\\$999Applies to all vehicles.");
+        auto user = GI::GetUser0Script();
+        auto config = user.Config;
+        if (config.Inputs_Vehicles.Length == 0) return;
+        auto v = config.Inputs_Vehicles[0];
+        bool tAccel = v.AccelIsToggleMode;
+        bool tBrake = v.BrakeIsToggleMode;
+        bool tInvert = v.InvertSteer;
+        v.AccelIsToggleMode = UI::Checkbox("Toggle Accel", v.AccelIsToggleMode);
+        UI::SameLine();
+        v.BrakeIsToggleMode = UI::Checkbox("Toggle Brake", v.BrakeIsToggleMode);
+        v.InvertSteer = UI::Checkbox("Invert Steer", v.InvertSteer);
+        bool changed = tAccel != v.AccelIsToggleMode ||
+                       tBrake != v.BrakeIsToggleMode ||
+                       tInvert != v.InvertSteer;
+        if (changed) {
+            SetVehicleTogglesSoon(v);
         }
     }
 
